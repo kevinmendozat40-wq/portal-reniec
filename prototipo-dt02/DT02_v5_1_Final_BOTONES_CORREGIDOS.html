@@ -193,4 +193,118 @@ function exportarFichaConvocatoria(){generarFichaConvocatoria();const c=el('conv
 function exportarCatalogoMCC(){const rows=['Cargo estructural,Grupo sugerido,Vinculos permitidos,Requisitos base,Funciones MCC'];Object.entries(MCC_CARGOS).forEach(([k,v])=>{const m=metaCargo(k);rows.push([k,m.grupo,m.vinculos,m.requisitos,v].map(csvCampo).join(','))});download(rows.join('\n'),'Catalogo_MCC_Cargos_DT02_v5.csv','text/csv;charset=utf-8;')}
 
 function exportarReporteExcel(){const html=`<html><head><meta charset="UTF-8"></head><body><h2>DT02_UGP-OPH_RENIEC - Reporte oficial</h2>${tableOfficial(visibleRecords().map(toOfficialRow),'tablaExport')}</body></html>`;download(html,'Reporte_DT02_v5_Final.xls','application/vnd.ms-excel;charset=utf-8;')}function exportarExcelActual(){const html=`<html><head><meta charset="UTF-8"></head><body><h2>DT02_Registro</h2>${tableOfficial([toOfficialRow(currentRecord(el('estadoInterno').value))],'tablaExportReg')}</body></html>`;download(html,'DT02_Registro_v5_Final.xls','application/vnd.ms-excel;charset=utf-8;')}function exportarCSV(){const rows=visibleRecords().map(toOfficialRow);const csv=[HEADERS.map(csvCampo).join(',')].concat(rows.map(r=>HEADERS.map(h=>csvCampo(r[h])).join(','))).join('\n');download(csv,'Reporte_DT02_v5_Final.csv','text/csv;charset=utf-8;')}function download(content,name,type){const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);msg('alert-ok','Archivo exportado.')}function msg(cls,text){const a=el('alerta');a.className='alert show '+cls;a.textContent=text;setTimeout(()=>a.className='alert',4000)}function modal(t,c){el('modalTitle').textContent=t;el('modalContent').innerHTML=c;el('modal').classList.add('show')}function cerrarModal(){el('modal').classList.remove('show')}init();
-</script></body></html>
+<script>
+/* === SINCRONIZACION DE PRUEBA CON GITHUB === */
+
+const GITHUB_CONFIG_DT02 = {
+  owner: "kevinmendozat40-wq",
+  repo: "portal-reniec",
+  branch: "main",
+  path: "prototipo-dt02/data/registros.json"
+};
+
+function githubTokenDT02() {
+  let token = localStorage.getItem("github_token_dt02");
+
+  if (!token) {
+    token = prompt("Pega tu token de GitHub para sincronizar los registros:");
+    if (token) {
+      localStorage.setItem("github_token_dt02", token.trim());
+    }
+  }
+
+  return token;
+}
+
+function toBase64Unicode(str) {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
+async function obtenerArchivoGithubDT02(token) {
+  const url = `https://api.github.com/repos/${GITHUB_CONFIG_DT02.owner}/${GITHUB_CONFIG_DT02.repo}/contents/${GITHUB_CONFIG_DT02.path}?ref=${GITHUB_CONFIG_DT02.branch}`;
+
+  const resp = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Accept": "application/vnd.github+json"
+    }
+  });
+
+  if (!resp.ok) {
+    throw new Error("No se pudo leer registros.json desde GitHub");
+  }
+
+  return await resp.json();
+}
+
+async function sincronizarRegistrosGithubDT02() {
+  try {
+    const token = githubTokenDT02();
+
+    if (!token) {
+      alert("No se ingresó token. Sincronización cancelada.");
+      return;
+    }
+
+    const archivoActual = await obtenerArchivoGithubDT02(token);
+
+    const registrosLocales = JSON.parse(
+      localStorage.getItem("dt02_v5_records") || "[]"
+    );
+
+    const contenidoJson = JSON.stringify(registrosLocales, null, 2);
+
+    const url = `https://api.github.com/repos/${GITHUB_CONFIG_DT02.owner}/${GITHUB_CONFIG_DT02.repo}/contents/${GITHUB_CONFIG_DT02.path}`;
+
+    const resp = await fetch(url, {
+      method: "PUT",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/vnd.github+json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: "Sincronizar registros DT02 desde prototipo",
+        content: toBase64Unicode(contenidoJson),
+        sha: archivoActual.sha,
+        branch: GITHUB_CONFIG_DT02.branch
+      })
+    });
+
+    if (!resp.ok) {
+      const error = await resp.text();
+      console.error(error);
+      throw new Error("GitHub rechazó la actualización del archivo.");
+    }
+
+    alert("Registros sincronizados correctamente en GitHub.");
+  } catch (error) {
+    console.error(error);
+    alert("Error al sincronizar con GitHub: " + error.message);
+  }
+}
+
+function crearBotonGithubDT02() {
+  const btn = document.createElement("button");
+  btn.textContent = "Sincronizar con GitHub";
+  btn.onclick = sincronizarRegistrosGithubDT02;
+
+  btn.style.position = "fixed";
+  btn.style.right = "20px";
+  btn.style.bottom = "20px";
+  btn.style.zIndex = "99999";
+  btn.style.padding = "12px 18px";
+  btn.style.borderRadius = "10px";
+  btn.style.border = "none";
+  btn.style.background = "#24292f";
+  btn.style.color = "#ffffff";
+  btn.style.fontWeight = "700";
+  btn.style.cursor = "pointer";
+  btn.style.boxShadow = "0 4px 12px rgba(0,0,0,.25)";
+
+  document.body.appendChild(btn);
+}                                                                        
+
+window.addEventListener("load", crearBotonGithubDT02);
+</script></body></html>                                                                                                                                                                                                                              
