@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DT01 v4 - Flujo 3 niveles funcional</title>
+  <style>
+    :root{
+      --azul:#003b71;--azul2:#005a9c;--azul3:#e6f2fb;--fondo:#f4f6f9;--borde:#d7dee9;--texto:#243143;--muted:#667085;
+      --verde:#1c7c54;--verdebg:#e8f7ef;--rojo:#a73838;--rojobg:#fdeaea;--ambar:#a86f00;--ambarbg:#fff5d6;--blanco:#fff;
+      --sombra:0 8px 24px rgba(15,23,42,.08);--radio:16px;
+    }
+    *{box-sizing:border-box} body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--fondo);color:var(--texto)} .hidden{display:none!important}
+    .login{min-height:100vh;display:grid;grid-template-columns:1fr 430px;background:linear-gradient(135deg,#002848,#003b71 55%,#005a9c)}
+    .login-hero{color:white;padding:56px;display:flex;flex-direction:column;justify-content:center}.login-hero h1{font-size:44px;margin:0 0 14px}.login-hero p{font-size:17px;line-height:1.6;max-width:800px;opacity:.92}
+    .login-card{background:white;padding:34px;display:flex;flex-direction:column;justify-content:center;box-shadow:-22px 0 60px rgba(0,0,0,.18)}
+    .demo-box{background:#f8fafc;border:1px solid var(--borde);border-radius:14px;padding:12px;margin-top:14px;font-size:13px;line-height:1.55}
+    .app{min-height:100vh;display:grid;grid-template-columns:292px 1fr}.sidebar{background:linear-gradient(180deg,var(--azul),#002848);color:white;padding:22px 16px;height:100vh;position:sticky;top:0;overflow:auto}
+    .brand{display:flex;gap:12px;align-items:center;margin-bottom:24px}.brand-logo{width:50px;height:50px;border-radius:14px;background:white;color:var(--azul);display:grid;place-items:center;font-weight:900;box-shadow:var(--sombra)}.brand h1{font-size:17px;margin:0}.brand span{font-size:12px;opacity:.78}.nav-title{margin:22px 10px 10px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;opacity:.68}.nav-item{width:100%;border:0;background:transparent;color:white;text-align:left;display:flex;gap:10px;align-items:center;padding:11px 12px;border-radius:12px;cursor:pointer;font-size:14px;opacity:.9}.nav-item:hover,.nav-item.active{background:rgba(255,255,255,.14);opacity:1}.user-card{margin-top:22px;padding:14px;border-radius:16px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.12);font-size:13px;line-height:1.45}
+    .main{padding:24px;overflow-x:hidden}.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:18px}h2{font-size:26px;margin:0;color:#172033}h3{font-size:18px;margin:0;color:#172033}h4{font-size:15px;margin:0;color:#172033}.topbar p{margin:6px 0 0;color:var(--muted);font-size:14px}.card{background:white;border:1px solid #edf0f5;border-radius:var(--radio);box-shadow:var(--sombra);padding:18px;margin-bottom:18px}.card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}.card-header small{display:block;margin-top:4px;color:var(--muted)}
+    .grid{display:grid;gap:16px}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}.kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}.kpi{background:white;border:1px solid #edf0f5;border-radius:16px;box-shadow:var(--sombra);padding:16px}.kpi span{display:block;color:var(--muted);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}.kpi strong{font-size:25px;color:#172033}
+    label{display:block;margin-bottom:7px;color:#4d5a6b;font-size:12px;font-weight:800}input,select,textarea{width:100%;border:1px solid var(--borde);border-radius:11px;padding:10px 12px;color:#172033;background:white;font-size:14px;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--azul2);box-shadow:0 0 0 3px rgba(0,90,156,.12)}textarea{resize:vertical;min-height:96px}.form-row{margin-bottom:12px}.btn-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px}button,.btn{border:0;border-radius:12px;padding:10px 14px;font-weight:800;font-size:14px;cursor:pointer}.btn-primary{background:var(--azul);color:white}.btn-secondary{background:var(--azul3);color:var(--azul)}.btn-ghost{background:#f1f4f8;color:#344054}.btn-danger{background:var(--rojobg);color:var(--rojo)}.btn-success{background:var(--verdebg);color:var(--verde)}
+    .pill{display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:800;border:1px solid transparent;white-space:nowrap}.pill-borrador{background:var(--ambarbg);color:var(--ambar);border-color:#ffe2a3}.pill-validado{background:var(--verdebg);color:var(--verde);border-color:#b8eacb}.pill-observado{background:var(--rojobg);color:var(--rojo);border-color:#f5c2c2}.pill-info{background:var(--azul3);color:var(--azul);border-color:#bddcf5}.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.chip{padding:7px 10px;border-radius:999px;background:#eef2f7;color:#344054;font-size:12px;font-weight:800}.divider{height:1px;background:#e7ebf1;margin:18px 0}.alert{display:none;border-radius:14px;padding:12px 14px;margin-bottom:16px;font-size:14px;line-height:1.45}.alert.show{display:block}.alert-ok{background:var(--verdebg);color:var(--verde);border:1px solid #b8eacb}.alert-error{background:var(--rojobg);color:var(--rojo);border:1px solid #f5c2c2}.alert-info{background:var(--azul3);color:var(--azul);border:1px solid #bddcf5}
+    .item-card{border:1px solid var(--borde);border-radius:15px;background:#fbfcfe;margin-bottom:12px;overflow:hidden}.item-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px;background:white;border-bottom:1px solid #e7ebf1;cursor:pointer}.item-head small{color:var(--muted)}.item-content{padding:14px}.item-card.collapsed .item-content{display:none}.item-card.collapsed .item-head{border-bottom:0}.option-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.check-option{display:flex;gap:8px;align-items:flex-start;min-height:46px;padding:9px;border:1px solid #e4e8f0;border-radius:11px;background:white;cursor:pointer;font-size:13px;line-height:1.35}.check-option input{width:auto;margin-top:2px}.process-open-box{margin:12px 0;padding:13px;border-radius:14px;background:var(--azul3);color:var(--azul);border:1px solid #bddcf5;font-size:14px;line-height:1.45}
+    .preview-table-wrap{overflow-x:auto;border:1px solid var(--borde);border-radius:14px}table{width:100%;border-collapse:collapse;background:white;font-size:13px}th{background:var(--azul);color:white;padding:10px;text-align:left;vertical-align:top;min-width:128px}td{border-top:1px solid #e7ebf1;padding:10px;vertical-align:top;min-width:128px;white-space:pre-line}.budget-table input{min-width:110px}.official-head th{white-space:nowrap;font-size:12px;min-width:120px}.official-head th:nth-child(4),.official-head th:nth-child(5){min-width:320px}.empty-state{padding:22px;text-align:center;border:1px dashed #c6d1df;border-radius:16px;background:#f8fafc;color:var(--muted)}.text-box{padding:13px;border-radius:13px;border:1px dashed #c6d1df;background:#f8fafc;white-space:pre-line;line-height:1.55;font-size:14px}.modal-backdrop{position:fixed;inset:0;z-index:50;display:none;place-items:center;padding:18px;background:rgba(9,30,66,.44)}.modal-backdrop.show{display:grid}.modal{width:min(980px,100%);max-height:88vh;overflow-y:auto;background:white;border-radius:20px;box-shadow:0 24px 70px rgba(0,0,0,.22);padding:20px}.modal-header{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:14px}.bar{height:12px;background:#edf2f7;border-radius:999px;overflow:hidden}.bar i{display:block;height:100%;background:var(--azul2)}
+    @media print{.sidebar,.topbar,.btn-row,.alert,.no-print{display:none!important}.app{display:block}.main{padding:0}.card{box-shadow:none;border:0}body{background:white}}
+    @media(max-width:1120px){.login{grid-template-columns:1fr}.login-hero{display:none}.app{grid-template-columns:1fr}.sidebar{position:static;height:auto}.grid-2,.grid-3,.grid-4,.kpi-grid,.option-list{grid-template-columns:1fr}.topbar{flex-direction:column}}
+  </style>
+</head>
+<body>
+<section id="loginView" class="login">
+  <div class="login-hero">
+    <h1 id="loginSystemTitle">DT01_UGP-OPH-RENIEC</h1>
+    <p id="loginSystemSubtitle">Reporte Antecedente de Estado Situacional a la Recepción de Cargo AOG Vr. Versión funcional con tres niveles: Subsistema, Proceso y Subproceso.</p>
+    <p><strong>Subsistemas:</strong> Gestión UGP, SS Gestión del Empleo y SS Gestión de Compensaciones.</p>
+  </div>
+  <div class="login-card">
+    <h2>Iniciar sesión</h2>
+    <p style="color:var(--muted);margin-top:8px">Use un usuario demo para validar el flujo.</p>
+    <div class="form-row"><label>Correo</label><input id="loginEmail" value="colaborador@dt01.gob.pe"></div>
+    <div class="form-row"><label>Contraseña</label><input id="loginPassword" type="password" value="123456"></div>
+    <div class="btn-row"><button class="btn-primary" onclick="login()">Ingresar</button><button class="btn-ghost" onclick="resetDemoData()">Restablecer demo</button></div>
+    <div class="demo-box">
+      <strong>Usuarios demo:</strong><br>
+      colaborador@dt01.gob.pe / 123456<br>
+      responsable@dt01.gob.pe / 123456<br>
+      admin@dt01.gob.pe / 123456<br>
+      consulta@dt01.gob.pe / 123456
+      <div class="btn-row" style="margin-top:10px">
+        <button class="btn-secondary" onclick="demoLogin('colaborador@dt01.gob.pe')">Colaborador</button>
+        <button class="btn-secondary" onclick="demoLogin('responsable@dt01.gob.pe')">Responsable</button>
+        <button class="btn-secondary" onclick="demoLogin('admin@dt01.gob.pe')">Admin</button>
+        <button class="btn-secondary" onclick="demoLogin('consulta@dt01.gob.pe')">Consulta</button>
+      </div>
+    </div>
+    <div id="loginMsg" class="alert alert-error" style="margin-top:14px"></div>
+  </div>
+</section>
+
+<div id="appShell" class="app hidden">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-logo" id="brandLogoDisplay">DT01</div><div><h1 id="brandSystemName">DT01_UGP-OPH-RENIEC</h1><span id="brandSystemSubtitle">Reporte Estado Situacional</span></div></div>
+    <div class="nav-title">Navegación</div><div id="navMenu"></div>
+    <div class="nav-title">Sesión</div><button class="nav-item" onclick="logout()">↩ Cerrar sesión</button>
+    <div class="user-card"><strong id="userNameSide">Usuario</strong><br><span id="userUnitSide">Unidad</span><br>Rol: <span id="userRoleSide">Rol</span><br>Proceso asignado: <span id="userProcessSide">Proceso</span></div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar"><div><h2 id="pageTitle">DT01 - Panel</h2><p id="pageSubtitle">Sistema web interactivo por perfiles y roles.</p></div><div class="btn-row no-print"><span class="pill pill-info">v4 GitHub + Power BI</span><button class="btn-secondary" onclick="abrirPowerBI()">Abrir BI</button><button class="btn-primary" onclick="abrirConfigGitHub()">Configurar GitHub</button><button class="btn-secondary" onclick="sincronizarGitHubManual()">Sincronizar GitHub</button></div></div>
+    <div id="alerta" class="alert"></div>
+
+    <section id="view-dashboard" class="view">
+      <div class="kpi-grid">
+        <div class="kpi"><span>Fichas registradas</span><strong id="kpiFichas">0</strong></div>
+        <div class="kpi"><span>Pendientes de revisión</span><strong id="kpiPendientes">0</strong></div>
+        <div class="kpi"><span>Validadas / exportadas</span><strong id="kpiValidadas">0</strong></div>
+        <div class="kpi"><span>Presupuesto estimado</span><strong id="kpiPresupuesto">S/ 0.00</strong></div>
+      </div>
+      <div class="grid grid-2">
+        <div class="card"><div class="card-header"><div><h3>Resumen por rol</h3><small>El panel se filtra según el perfil logueado.</small></div></div><div id="dashboardResumen" class="text-box"></div></div>
+        <div class="card"><div class="card-header"><div><h3>Distribución por estado</h3><small>Borrador, enviado, observado, validado y exportado.</small></div></div><div id="estadoBars"></div></div>
+      </div>
+      <div class="card"><div class="card-header"><div><h3>Últimas fichas DT01</h3><small>Tabla con cabeceras oficiales.</small></div><button class="btn-secondary" onclick="seedMoreFichas()">Agregar datos demo</button></div><div id="tablaUltimasFichas"></div></div>
+      <div class="card">
+        <div class="card-header"><div><h3>Dashboard operativo y gerencial</h3><small>Vista ejecutiva para seguimiento de avance, presupuesto, requerimiento de RR.HH. y alertas de gestión.</small></div><button class="btn-secondary" onclick="renderDashboard()">Actualizar dashboard</button></div>
+        <div class="grid grid-4">
+          <div class="kpi"><span>% avance validado</span><strong id="dashAvanceValidado">0%</strong></div>
+          <div class="kpi"><span>Fichas observadas</span><strong id="dashObservadas">0</strong></div>
+          <div class="kpi"><span>Costo RH mensual</span><strong id="dashCostoRh">S/ 0.00</strong></div>
+          <div class="kpi"><span>Costo logístico</span><strong id="dashCostoLogistico">S/ 0.00</strong></div>
+        </div>
+        <div class="grid grid-2">
+          <div><h4>Alertas de gestión</h4><div id="dashAlertas" class="text-box"></div></div>
+          <div><h4>Resumen presupuestal por régimen</h4><div id="dashPresupuestoRegimen" class="text-box"></div></div>
+        </div>
+        <div class="divider"></div>
+        <div class="grid grid-2">
+          <div><h4>Consolidado por subsistema</h4><div id="dashSubsistemas"></div></div>
+          <div><h4>Consolidado por proceso</h4><div id="dashProcesos"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-registro" class="view hidden">
+      <div class="card">
+        <div class="card-header"><div><h3>Registro de ficha DT01</h3><small>Seleccione Subsistema, Proceso y Subproceso.</small></div><span class="pill pill-info">Registro</span></div>
+        <div class="grid grid-4">
+          <div class="form-row"><label>Fecha de corte</label><input type="date" id="fechaCorte" value="2026-04-20"></div>
+          <div class="form-row"><label>Año</label><input type="number" id="anioGestion" value="2026"></div>
+          <div class="form-row"><label>Unidad orgánica</label><input id="unidadOrganica" value="Unidad de Gestión de Personal - UGP"></div>
+          <div class="form-row"><label>Responsable</label><input id="responsableLlenado"></div>
+        </div>
+        <div class="grid grid-4">
+          <div class="form-row"><label>Subsistema</label><select id="subsistema"></select></div>
+          <div class="form-row"><label>Proceso</label><select id="procesoGrupo"></select></div>
+          <div class="form-row"><label>Subproceso</label><select id="subproceso"></select></div>
+          <div class="form-row"><label>Estado</label><select id="estadoRegistro"><option>Borrador</option><option>Enviado</option><option>Observado</option><option>Validado</option><option>Exportado</option></select></div>
+        </div>
+        <div id="chipsProceso" class="chip-row"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div><h3>Estado situacional</h3><small>Opciones configuradas según el subproceso seleccionado.</small></div><div class="btn-row"><button class="btn-secondary" onclick="expandirItems()">Expandir</button><button class="btn-ghost" onclick="contraerItems()">Contraer</button><button class="btn-secondary" onclick="marcarSugeridas()">Marcar demo</button><button class="btn-primary" onclick="generarTextoSituacional()">Generar texto</button></div></div>
+        <div id="itemsContainer"></div><div class="divider"></div>
+        <div class="form-row"><label>Estado situacional generado</label><textarea id="estadoSituacionalTexto"></textarea></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div><h3>Acciones a adoptar 2026</h3><small>Acciones sugeridas según el subproceso.</small></div><div class="btn-row"><button class="btn-secondary" onclick="marcarAccionesClave()">Marcar clave</button><button class="btn-ghost" onclick="desmarcarAcciones()">Desmarcar</button><button class="btn-primary" onclick="generarTextoAcciones()">Generar acciones</button></div></div>
+        <div id="accionesContainer" class="option-list"></div><div class="divider"></div>
+        <div class="grid grid-3"><div class="form-row"><label>Plazo hasta</label><input type="date" id="plazoHasta" value="2026-12-31"></div><div class="form-row"><label>Responsables</label><input id="responsables" value="UGP / Responsable del proceso"></div><div class="form-row"><label>Prioridad</label><select id="prioridad"><option>Alta</option><option selected>Media</option><option>Baja</option></select></div></div>
+        <div class="form-row"><label>Acciones generadas</label><textarea id="accionesTexto"></textarea></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div><h3>Recursos logísticos y presupuesto de RR.HH.</h3><small>Ingrese cantidad y costo unitario mensual por régimen.</small></div><button class="btn-secondary" onclick="calcularRecursos()">Calcular</button></div>
+        <div class="grid grid-3">
+          <div class="form-row"><label>Recurso logístico requerido</label><select id="tipoRecurso"><option>No requiere</option><option>Sistema informático</option><option>Equipos biométricos</option><option>Digitalización documental</option><option>Espacio físico / archivo</option><option>Servicio externo</option><option>Otro</option></select></div>
+          <div class="form-row"><label>S/ aprox. recurso logístico</label><input type="number" id="costoLogistico" value="0" min="0" step="0.01"></div>
+          <div class="form-row"><label>Comentario presupuestal</label><input type="text" id="comentarioPresupuesto" value="Sujeto a disponibilidad presupuestal y evaluación de la unidad competente."></div>
+        </div>
+        <div class="form-row"><label>Descripción RR. logísticos</label><textarea id="descRecurso"></textarea></div>
+        <div class="divider"></div>
+        <h4 style="margin-bottom:12px">Detalle presupuestal por tipo de contratación</h4>
+        <div class="preview-table-wrap">
+          <table class="budget-table">
+            <thead><tr><th>Tipo de contratación</th><th>Cantidad requerida</th><th>Costo unitario mensual S/</th><th>Subtotal mensual S/</th><th>Sustento / observación</th></tr></thead>
+            <tbody>
+              <tr><td><strong>DL 728</strong></td><td><input type="number" id="req728" value="0" min="0" step="1"></td><td><input type="number" id="costo728" value="0" min="0" step="0.01"></td><td><input id="sub728" value="0.00" disabled></td><td><input id="obs728" placeholder="Ejemplo: Especialista administrativo DL 728"></td></tr>
+              <tr><td><strong>CAS</strong></td><td><input type="number" id="reqCas" value="0" min="0" step="1"></td><td><input type="number" id="costoCas" value="0" min="0" step="0.01"></td><td><input id="subCas" value="0.00" disabled></td><td><input id="obsCas" placeholder="Ejemplo: Apoyo CAS para control operativo"></td></tr>
+              <tr><td><strong>Locación / servicio</strong></td><td><input type="number" id="reqLocacion" value="0" min="0" step="1"></td><td><input type="number" id="costoLocacion" value="0" min="0" step="0.01"></td><td><input id="subLocacion" value="0.00" disabled></td><td><input id="obsLocacion" placeholder="Ejemplo: Locador para consolidación de reportes"></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="divider"></div>
+        <div class="grid grid-4">
+          <div class="form-row"><label>Total Req. RH</label><input id="totalReqRH" value="0" disabled></div>
+          <div class="form-row"><label>S/ Req. RH mensual</label><input id="totalCostoRH" value="0.00" disabled></div>
+          <div class="form-row"><label>S/ aprox. logístico</label><input id="resumenCostoLogistico" value="0.00" disabled></div>
+          <div class="form-row"><label>Subtotal general S/</label><input id="subtotalEstimado" value="0.00" disabled></div>
+        </div>
+        <div class="text-box" id="resumenPresupuestoRH">Ejemplo: 2 locadores x S/ 1,000.00 + 1 CAS x S/ 1,300.00 = S/ 3,300.00 mensual.</div>
+      </div>
+
+      <div class="card no-print"><div class="btn-row"><button class="btn-primary" onclick="validarFicha()">Validar</button><button class="btn-secondary" onclick="guardarFicha('Borrador')">Guardar borrador</button><button class="btn-success" onclick="guardarFicha('Enviado')">Enviar a revisión</button><button class="btn-ghost" onclick="vistaPreviaActual()">Vista previa</button><button class="btn-primary" onclick="exportarExcelActual()">Exportar Excel</button><button class="btn-danger" onclick="nuevaFicha()">Nueva ficha</button></div></div>
+    </section>
+
+    <section id="view-revision" class="view hidden"><div class="card"><div class="card-header"><div><h3>Bandeja de revisión</h3><small>Validación u observación de fichas enviadas.</small></div><button class="btn-secondary" onclick="renderRevision()">Actualizar</button></div><div id="revisionContainer"></div></div></section>
+    <section id="view-reportes" class="view hidden"><div class="card"><div class="card-header"><div><h3>Reportes KPI</h3><small>Todos los reportes respetan las cabeceras oficiales DT01.</small></div><div class="btn-row"><button class="btn-secondary" onclick="renderReportes()">Actualizar</button><button class="btn-ghost" onclick="exportarKpiCSV()">Exportar CSV</button><button class="btn-primary" onclick="exportarReporteExcel()">Exportar Excel DT01</button><button class="btn-ghost" onclick="imprimir()">Imprimir</button></div></div><div id="reportesContainer"></div></div></section>
+    <section id="view-admin" class="view hidden">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h3>Configuración de identidad del sistema</h3>
+            <small>El administrador puede editar el nombre oficial, versión, entidad, unidad, oficina y logo visible del microsistema.</small>
+          </div>
+          <div class="btn-row"><button class="btn-primary" onclick="guardarConfigSistema()">Guardar configuración</button><button class="btn-ghost" onclick="restaurarConfigSistema()">Restaurar por defecto</button></div>
+        </div>
+        <div class="grid grid-3">
+          <div class="form-row"><label>Nombre oficial del sistema</label><input id="configNombreSistema"></div>
+          <div class="form-row"><label>Sigla / código corto</label><input id="configSiglaSistema"></div>
+          <div class="form-row"><label>Versión</label><input id="configVersionSistema"></div>
+          <div class="form-row"><label>Entidad</label><input id="configEntidad"></div>
+          <div class="form-row"><label>Unidad / área usuaria</label><input id="configUnidad"></div>
+          <div class="form-row"><label>Oficina / órgano</label><input id="configOficina"></div>
+        </div>
+        <div class="grid grid-3">
+          <div class="form-row"><label>Texto alternativo del logo</label><input id="configLogoTexto" placeholder="Ejemplo: RENIEC"></div>
+          <div class="form-row"><label>Cargar logo institucional</label><input id="configLogoArchivo" type="file" accept="image/*" onchange="cargarLogoSistema(event)"></div>
+          <div class="form-row"><label>Vista previa</label><div class="brand-logo" id="configLogoPreview" style="color:var(--azul);border:1px solid var(--borde)">DT01</div></div>
+        </div>
+        <div class="text-box" id="configResumenSistema">Configuración actual del sistema.</div>
+      </div>
+      <div class="grid grid-2"><div class="card"><div class="card-header"><div><h3>Administrador y Analista de Sistemas</h3><small>Gestiona usuarios, perfiles, accesos por subproceso y analiza los KPI del módulo DT01.</small></div><button class="btn-secondary" onclick="limpiarUsuarioForm()">Nuevo usuario</button></div><div class="grid grid-2"><div class="form-row"><label>Nombres</label><input id="adminUserNombre"></div><div class="form-row"><label>Correo</label><input id="adminUserCorreo"></div><div class="form-row"><label>Contraseña demo</label><input id="adminUserPass" value="123456"></div><div class="form-row"><label>Unidad</label><input id="adminUserUnidad" value="Unidad de Gestión de Personal - UGP"></div><div class="form-row"><label>Rol</label><select id="adminUserRol"><option>Colaborador</option><option>Responsable de proceso</option><option>Administrador de sistemas</option><option>Consulta / Dirección</option></select></div><div class="form-row"><label>Subproceso asignado</label><select id="adminUserProceso"></select></div><div class="form-row"><label>Estado</label><select id="adminUserEstado"><option>Activo</option><option>Inactivo</option></select></div></div><input type="hidden" id="adminUserId"><div class="btn-row"><button class="btn-primary" onclick="guardarUsuarioAdmin()">Guardar usuario</button><button class="btn-ghost" onclick="exportarUsuariosCSV()">Exportar usuarios</button><button class="btn-danger" onclick="resetDemoData()">Restablecer demo</button></div></div><div class="card"><div class="card-header"><div><h3>KPI de administración y análisis</h3><small>Control de usuarios, carga operativa, presupuesto, avance y validación de fichas.</small></div></div><div id="adminKpiBox" class="text-box"></div></div></div>
+      <div class="card">
+        <div class="card-header"><div><h3>Panel analítico del administrador</h3><small>Indicadores para evaluar uso del sistema, avance de fichas, requerimientos de RR.HH. y presupuesto estimado.</small></div><div class="btn-row"><button class="btn-secondary" onclick="renderAdmin()">Actualizar KPI</button><button class="btn-ghost" onclick="exportarAdminKpiCSV()">Exportar KPI admin</button></div></div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Usuarios activos</span><strong id="adminKpiUsuariosActivos">0</strong></div>
+          <div class="kpi"><span>Fichas registradas</span><strong id="adminKpiFichasTotal">0</strong></div>
+          <div class="kpi"><span>Req. RH total</span><strong id="adminKpiReqRhTotal">0</strong></div>
+          <div class="kpi"><span>Presupuesto total</span><strong id="adminKpiPresupuestoTotal">S/ 0.00</strong></div>
+        </div>
+        <div class="grid grid-2">
+          <div><h4>Distribución de usuarios por perfil</h4><div id="adminUsuariosRolBox" class="text-box"></div></div>
+          <div><h4>Distribución de fichas por estado</h4><div id="adminFichasEstadoBox" class="text-box"></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div><h3>Matriz de roles y permisos</h3><small>Referencia funcional para validar qué puede hacer cada perfil dentro del microsistema.</small></div></div>
+        <div id="adminMatrizPermisos"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div><h3>Reporte KPI por subsistema, proceso y subproceso</h3><small>Vista de analista de sistemas para verificar cobertura, carga presupuestal y avance de validación.</small></div><button class="btn-secondary" onclick="renderAdminReporteKpi()">Actualizar reporte</button></div>
+        <div id="adminReporteKpi"></div>
+      </div>
+      <div class="card"><div class="card-header"><div><h3>Usuarios registrados</h3><small>Editar rol o subproceso asignado.</small></div></div><div id="adminUsuariosTabla"></div></div><div class="card"><div class="card-header"><div><h3>Catálogo institucional</h3><small>Subsistema, proceso y subproceso.</small></div><button class="btn-ghost" onclick="exportarCatalogoCSV()">Exportar catálogo</button></div><div id="catalogoTabla"></div></div></section>
+    <section id="view-preview" class="view hidden"><div class="card"><div class="card-header"><div><h3>Vista previa DT01</h3><small>Formato oficial exportable.</small></div><div class="btn-row"><button class="btn-primary" onclick="exportarExcelActual()">Exportar Excel</button><button class="btn-ghost" onclick="imprimir()">Imprimir</button></div></div><div id="previewContainer"></div></div></section>
+  </main>
+</div>
+
+<div id="modal" class="modal-backdrop"><div class="modal"><div class="modal-header"><h3 id="modalTitle">Detalle</h3><button class="btn-ghost" onclick="cerrarModal()">Cerrar</button></div><div id="modalContent"></div></div></div>
+
+<script>
+const salto='\n';
+const HEADERS=["SUB SISTEMAS", "PROCESOS", "ESTADO SITUACIONAL al 20-04-2026", "ACCIONES  A ADOPTAR  A CORTO Y MEDIANO PLAZO 2026", "PLAZO HASTA", "RESPONSABLES", "RR-LOGISTICOS", "s/ APROX", "DL 728", "CAS", "LOC SS", "Total Req RH", "S/ Req RH mensual", "SUB TOTAL"];
+const INITIAL_FICHAS=[{"id": "f1", "codigo": "DT01-2026-0001", "fechaCorte": "2026-04-20", "anio": "2026", "unidad": "Unidad de Gestión de Personal - UGP", "responsable": "", "subsistema": "Ss3: GESTIÓN DEL EMPLEO", "procesoGrupo": "5.- Requerimiento / Selección", "subCodigo": "5", "subNombre": "Requerimiento / Selección", "item": "5.- Requerimiento / Selección", "estado": "Borrador", "estadoTexto": "PROCESOS DE SELECCIÓN 2025
+
+Procesos CAS (71)  
+Puestos Convocados             Temporales: (41) / Suplencia (30) / Nuevos (0)    
+Resultado: Ocupados (49 )   Desiertos/Vacantes (22 )
+
+Procesos 728 ( 06  )  
+Puestos Convocados (22).   Plazo indeterminado: (17) / Suplencia (05) / Nuevos (0)
+Resultado : Ocupados (16)   Desiertos/Vacantes (07)
+Ocupado a plazo indeterminado (14) / ocupado suplencia (02)
+ 
+Procesos  Prácticas  Preprofesionales (17)  
+Puestos Convocados Temporales: Reemplazo (20) Nuevos (0)    
+Resultado: N° de vacantes ocupadas (19)   Desiertos (  1  )
+Procesos Prácticas Profesionales (21)  
+Puestos Convocados Temporales: Reemplazo (25) Nuevos (0)    
+Resultado: N° de vacantes ocupadas (25)   Desiertos (  0  )", "accionesTexto": "1.        Coberturar OPORTUNAMENTE las plazas vacantes o desiertas mediante modificaciones a los plazos de presentación para hacer uso de Licencias Sin Goce Mayores a 30 días y simplificar la gestión administrativa para la cobertura de dichos puestos // 
+2.        Implementar procesos de Concurso más Atractivo en remuneraciones y sin el requisito de Certificación  en Bines Estatales 8Sinedo solo exigible a puestos de Especialistas a mas)
+3.        Sistematizar el Proceso de Selección vía Plataforma WEB.
+4.        PROCESOS DE SELECCIÓN 2026
+Procesos CAS (17)  
+Puestos Convocados: (18)            Temporales: (05) / Suplencia (13) / Nuevos (.00 )    
+Resultado: Ocupados (-)   Desiertos/Vacantes (-)
+Procesos 728( 01  )  
+Puestos Convocados (02).   Plazo indeterminado: (01) / Suplencia (01) / Nuevos (0)
+Resultado : Ocupados (-)   Desiertos/Vacantes (-)
+Ocupado a plazo indeterminado (-) / ocupado suplencia (-)", "plazo": "", "responsables": "", "rrlog": "", "costoLogistico": 0, "req728": 0, "reqCas": 0, "reqLocacion": 0, "costo728": 0, "costoCas": 0, "costoLocacion": 0, "obs728": "", "obsCas": "", "obsLocacion": "", "totalReqRH": 0, "totalCostoRH": 0, "total": 0, "creadoEn": "", "_official": {"SUB SISTEMAS": "Ss3: GESTIÓN DEL EMPLEO", "PROCESOS": "5.- Requerimiento / Selección", "ESTADO SITUACIONAL al 20-04-2026": "PROCESOS DE SELECCIÓN 2025
+
+Procesos CAS (71)  
+Puestos Convocados             Temporales: (41) / Suplencia (30) / Nuevos (0)    
+Resultado: Ocupados (49 )   Desiertos/Vacantes (22 )
+
+Procesos 728 ( 06  )  
+Puestos Convocados (22).   Plazo indeterminado: (17) / Suplencia (05) / Nuevos (0)
+Resultado : Ocupados (16)   Desiertos/Vacantes (07)
+Ocupado a plazo indeterminado (14) / ocupado suplencia (02)
+ 
+Procesos  Prácticas  Preprofesionales (17)  
+Puestos Convocados Temporales: Reemplazo (20) Nuevos (0)    
+Resultado: N° de vacantes ocupadas (19)   Desiertos (  1  )
+Procesos Prácticas Profesionales (21)  
+Puestos Convocados Temporales: Reemplazo (25) Nuevos (0)    
+Resultado: N° de vacantes ocupadas (25)   Desiertos (  0  )", "ACCIONES  A ADOPTAR  A CORTO Y MEDIANO PLAZO 2026": "1.        Coberturar OPORTUNAMENTE las plazas vacantes o desiertas mediante modificaciones a los plazos de presentación para hacer uso de Licencias Sin Goce Mayores a 30 días y simplificar la gestión administrativa para la cobertura de dichos puestos // 
+2.        Implementar procesos de Concurso más Atractivo en remuneraciones y sin el requisito de Certificación  en Bines Estatales 8Sinedo solo exigible a puestos de Especialistas a mas)
+3.        Sistematizar el Proceso de Selección vía Plataforma WEB.
+4.        PROCESOS DE SELECCIÓN 2026
+Procesos CAS (17)  
+Puestos Convocados: (18)            Temporales: (05) / Suplencia (13) / Nuevos (.00 )    
+Resultado: Ocupados (-)   Desiertos/Vacantes (-)
+Procesos 728( 01  )  
+Puestos Convocados (02).   Plazo indeterminado: (01) / Suplencia (01) / Nuevos (0)
+Resultado : Ocupados (-)   Desiertos/Vacantes (-)
+Ocupado a plazo indeterminado (-) / ocupado suplencia (-)", "PLAZO HASTA": "", "RESPONSABLES": "", "RR-LOGISTICOS": "", "s/ APROX": "", "DL 728": "", "CAS": "", "LOC SS": "", "Total Req RH": "", "S/ Req RH mensual": "", "SUB TOTAL": ""}}, {"id": "f2", "codigo": "DT01-2026-0002", "fechaCorte": "2026-04-20", "anio": "2026", "unidad": "Unidad de Gestión de Personal - UGP", "responsable": "", "subsistema": "Ss3: GESTIÓN DEL EMPLEO", "procesoGrupo": "6.- Contratación- Vinculación", "subCodigo": "6", "subNombre": "Contratación- Vinculación", "item": "6.- Contratación- Vinculación", "estado": "Borrador", "estadoTexto": "", "accionesTexto": "1. lmplementar procesos de contratación con incio de servicios apartir de l primer día hábil de cada mes , a finde evitar  problemas repsectoa Declaraciones de Aportes y Contribiciones a Fondps de Pensiones, SUNAT y ESSALUD", "plazo": "", "responsables": "", "rrlog": "", "costoLogistico": 0, "req728": 0, "reqCas": 0, "reqLocacion": 0, "costo728": 0, "costoCas": 0, "costoLocacion": 0, "obs728": "", "obsCas": "", "obsLocacion": "", "totalReqRH": 0, "totalCostoRH": 0, "total": 0, "creadoEn": "", "_official": {"SUB SISTEMAS": "Ss3: GESTIÓN DEL EMPLEO", "PROCESOS": "6.- Contratación- Vinculación", "ESTADO SITUACIONAL al 20-04-2026": "", "ACCIONES  A ADOPTAR  A CORTO Y MEDIANO PLAZO 2026": "1. lmplementar procesos de contratación con incio de servicios apartir de l primer día hábil de cada mes , a finde evitar  problemas repsectoa Declaraciones de Aportes y Contribiciones a Fondps de Pensiones, SUNAT y ESSALUD", "PLAZO HASTA": "", "RESPONSABLES": "", "RR-LOGISTICOS": "", "s/ APROX": "", "DL 728": "", "CAS": "", "LOC SS": "", "Total Req RH": "", "S/ Req RH mensual": "", "SUB TOTAL": ""}}, {"id": "f3", "codigo": "DT01-2026-0003", "fechaCorte": "2026-04-20", "anio": "2026", "unidad": "Unidad de Gestión de Personal - UGP", "responsable": "1. Equipo de Legajos", "subsistema": "Ss3: GESTIÓN DEL EMPLEO", "procesoGrupo": "9.- Administración de Legajos", "subCodigo": "9", "subNombre": "Administración de Legajos", "item": "9.- Administración de Legajos", "estado": "Borrador", "estadoTexto": "1. Pendiente de aperturar aprox. 800 nuevos legajos CAS (transitorios y electorales)
+2. Transferir 99 legajos de pensionistas a la ONP", "accionesTexto": "1. Se tiene pendiente la recepción y apertura de nuevos legajos, asimismo, se advierte la FALTA DE ESPACIO DISPONIBLE en tanto no liberemos los formatos que irían al almacen de Catallino Miranda.
+2. Elaborar el inventario de acuerdo con la estructura determinada por la ONP.", "plazo": "", "responsables": "1. Equipo de Legajos", "rrlog": "", "costoLogistico": 0, "req728": 0, "reqCas": 0, "reqLocacion": 0, "costo728": 0, "costoCas": 0, "costoLocacion": 0, "obs728": "", "obsCas": "", "obsLocacion": "", "totalReqRH": 0, "totalCostoRH": 0, "total": 0, "creadoEn": "", "_official": {"SUB SISTEMAS": "Ss3: GESTIÓN DEL EMPLEO", "PROCESOS": "9.- Administración de Legajos", "ESTADO SITUACIONAL al 20-04-2026": "1. Pendiente de aperturar aprox. 800 nuevos legajos CAS (transitorios y electorales)
+2. Transferir 99 legajos de pensionistas a la ONP", "ACCIONES  A ADOPTAR  A CORTO Y MEDIANO PLAZO 2026": "1. Se tiene pendiente la recepción y apertura de nuevos legajos, asimismo, se advierte la FALTA DE ESPACIO DISPONIBLE en tanto no liberemos los formatos que irían al almacen de Catallino Miranda.
+2. Elaborar el inventario de acuerdo con la estructura determinada por la ONP.", "PLAZO HASTA": "", "RESPONSABLES": "1. Equipo de Legajos", "RR-LOGISTICOS": "", "s/ APROX": "", "DL 728": "", "CAS": "", "LOC SS": "", "Total Req RH": "", "S/ Req RH mensual": "", "SUB TOTAL": ""}}, {"id": "f4", "codigo": "DT01-2026-0004", "fechaCorte": "2026-04-20", "anio": "2026", "unidad": "Unidad de Gestión de Personal - UGP", "responsable": "1. Juan Jave Poma
+2. Locador de apoyo en control de asistencia", "subsistema": "Ss3: GESTIÓN DEL EMPLEO", "procesoGrupo": "10.- Control de Asistencia  /  Lic - Vacaciones", "subCodigo": "10", "subNombre": "Control de Asistencia  /  Lic - Vacaciones", "item": "10.- Control de Asistencia  /  Lic - Vacaciones", "estado": "Borrador", "estadoTexto": "1. El porcentaje de tardanzas e inasistencias se mantienen en el ultimo semestre de 2025.
+2. Los permisos compensables de 16 horas estan vigentes hasta el 31/12/2025, segun convenio colectivo centralizado.
+3. Vacaciones acumuladas CAS y CAP: 16
+4. Implementacion de teletrabajo: Teletrabajo (41 %) presencial (59 %)
+5. Instrumento de control de teletrabajo: Reporte de actividades mensual. Presentacion primeros dias del mes siguiente", "accionesTexto": "1. En enero 2025 se empezará a reportar las tardanzas a las UO para su posible sancion administrativa a ST en caso de reincidencias.
+2. Se esta a la espera de la informacion del area legal de URH para considerar los permisos compensables por convenio colectivo o laudo para el periodo 2026
+3. La acumulacion de vacaciones se debe a la necesidad del servicio de las UO, pero se comunicara la relacion de los que estan acumulando para que se tomen las acciones
+4. Las funciones de teletrabajo se realiza en adicion a mis funciones, pero se requiere un personal que realice dichas actividades para implementar mejoras en las adendas, reportes, actualizacion de normativas internas e instrumentos digitales para verificar el cumplimiento de actividades a distancia.", "plazo": "", "responsables": "1. Juan Jave Poma
+2. Locador de apoyo en control de asistencia", "rrlog": "1. Es necesario la compra de nuevos relojes biometricos (renovacion)
+2. Sistema de control de asistencia que ayude a gestionar el proceso en el menor tiempo.
+3. Continuar con la contratacion del locador en control de asistencia.
+4. Ncesidad de un personal responsable del proceso de otorgamiento de teletrabajo", "costoLogistico": 0, "req728": 0, "reqCas": 0, "reqLocacion": 0, "costo728": 0, "costoCas": 0, "costoLocacion": 0, "obs728": "", "obsCas": "", "obsLocacion": "", "totalReqRH": 0, "totalCostoRH": 0, "total": 0, "creadoEn": "", "_official": {"SUB SISTEMAS": "Ss3: GESTIÓN DEL EMPLEO", "PROCESOS": "10.- Control de Asistencia  /  Lic - Vacaciones", "ESTADO SITUACIONAL al 20-04-2026": "1. El porcentaje de tardanzas e inasistencias se mantienen en el ultimo semestre de 2025.
+2. Los permisos compensables de 16 horas estan vigentes hasta el 31/12/2025, segun convenio colectivo centralizado.
+3. Vacaciones acumuladas CAS y CAP: 16
+4. Implementacion de teletrabajo: Teletrabajo (41 %) presencial (59 %)
+5. Instrumento de control de teletrabajo: Reporte de actividades mensual. Presentacion primeros dias del mes siguiente", "ACCIONES  A ADOPTAR  A CORTO Y MEDIANO PLAZO 2026": "1. En enero 2025 se empezará a reportar las tardanzas a las UO para su posible sancion administrativa a ST en caso de reincidencias.
+2. Se esta a la espera de la informacion del area legal de URH para considerar los permisos compensables por convenio colectivo o laudo para el periodo 2026
+3. La acumulacion de vacaciones se debe a la necesidad del servicio de las UO, pero se comunicara la relacion de los que estan acumulando para que se tomen las acciones
+4. Las funciones de teletrabajo se realiza en adicion a mis funciones, pero se requiere un personal que realice dichas actividades para implementar mejoras en las adendas, reportes, actualizacion de normativas internas e instrumentos digitales para verificar el cumplimiento de actividades a distancia.", "PLAZO HASTA": "", "RESPONSABLES": "1. Juan Jave Poma
+2. Locador de apoyo en control de asistencia", "RR-LOGISTICOS": "1. Es necesario la compra de nuevos relojes biometricos (renovacion)
+2. Sistema de control de asistencia que ayude a gestionar el proceso en el menor tiempo.
+3. Continuar con la contratacion del locador en control de asistencia.
+4. Ncesidad de un personal responsable del proceso de otorgamiento de teletrabajo", "s/ APROX": "", "DL 728": "", "CAS": "", "LOC SS": "", "Total Req RH": "", "S/ Req RH mensual": "", "SUB TOTAL": ""}}, {"id": "f5", "codigo": "DT01-2026-0005", "fechaCorte": "2026-04-20", "anio": "2026", "unidad": "Unidad de Gestión de Personal - UGP", "responsable": "", "subsistema": "Ss3: GESTIÓN DEL EMPLEO", "procesoGrupo": "11.- Desplazamiento de Trabajadores", "subCodigo": "11", "subNombre": "Desplazamiento de Trabajadores", "item": "11.- Desplazamiento de Trabajadores", "estado": "Borrador", "estadoTexto": "", "accionesTexto": "1. se ha Procediod a Sanera el exceo en Plazo de rotaciones  CAS  via Adenda Cambio de Lugar o Retoro  apuesto primigenio", "plazo": "", "responsables": "", "rrlog": "", "costoLogistico": 0, "req728": 0, "reqCas": 0, "reqLocacion": 0, "costo728": 0, "costoCas": 0, "costoLocacion": 0, "obs728": "", "obsCas": "", "obsLocacion": "", "totalReqRH": 0, "totalCostoRH": 0, "total": 0, "creadoEn": "", "_official": {"SUB SISTEMAS": "Ss3: GESTIÓN DEL EMPLEO", "PROCESOS": "11.- Desplazamiento de Trabajadores", "ESTADO SITUACIONAL al 20-04-2026": "", "ACCIONES  A ADOPTAR  A CORTO Y MEDIANO PLAZO 2026": "1. se ha Procediod a Sanera el exceo en Plazo de rotaciones  CAS  via Adenda Cambio de Lugar o Retoro  apuesto primigenio", "PLAZO HASTA": "", "RESPONSABLES": "", "RR-LOGISTICOS": "", "s/ APROX": "", "DL 728": "", "CAS": "", "LOC SS": "", "Total Req RH": "", "S/ Req RH mensual": "", "SUB TOTAL": ""}}, {"id": "f6", "codigo": "DT01-2026-0006", "fechaCorte": "2026-04-20", "anio": "2026", "unidad": "Unidad de Gestión de Personal - UGP", "responsable": "Elizabeth Luyo", "subsistema": "Ss5: GESTIÓN DE COMPENSACIONES", "procesoGrupo": "15.- Administración de Remuneraciones  - Compensaciones", "subCodigo": "15", "subNombre": "Administración de Remuneraciones  - Compensaciones", "item": "15.- Administración de Remuneraciones  - Compensaciones", "estado": "Borrador", "estadoTexto": "1. GESTIÓN DE PAGO DE PLANILLAS DE COMPENSACIONES ECONÓMICAS Y NO ECONÓMICAS - SE HA CUMPLIDO EN SU TOTALIDAD RESPECTO A LAS PLANILLAS CAS REMUNERACIONES Y PAGO POR VACACIONES TRUNCAS Y/O NO GOZADAS
+2. DECLARACIONES Y PAGO DE T-REGISTRO / PLAME -SUNAT - HASTA EL MES DE NOVIEMBRE /DIC SE DECLARA ENERO 2026
+3. DECLARACIONES Y PAGO DE AFP-NET - SE HA CUMPLID CON TODAS LASDECLARACIONES Y / O PAGOS CORRESPONDIENTE A LAS PLANILLA DEL 2025 / REPRO / DEUDAS AFP / 
+4. PAGO DE LIQUIDACIONES DE BENEFICIOS SOCIO-LABORALESPlanilla Electrónica (PLAME) según Cronograma Tributario 2025 EN SU TOTALIDAD  HASTA EL MES DE NOVIEMBRE / DIC se declara en enero del 2026.", "accionesTexto": "Queda pendiente el pago de tres liquidaciones de beneficios sociales del personal que han renunciado en el mes de dicembre. El dia de hoy el encargado de control de asistencia me ha enviado los record vacacionales de los 3 servidores para el cálculo de su liquidación.", "plazo": "Mes de enero de 2026", "responsables": "Elizabeth Luyo", "rrlog": "", "costoLogistico": 0, "req728": 0, "reqCas": 0, "reqLocacion": 0, "costo728": 0, "costoCas": 0, "costoLocacion": 0, "obs728": "", "obsCas": "", "obsLocacion": "", "totalReqRH": 0, "totalCostoRH": 0, "total": 0, "creadoEn": "", "_official": {"SUB SISTEMAS": "Ss5: GESTIÓN DE COMPENSACIONES", "PROCESOS": "15.- Administración de Remuneraciones  - Compensaciones", "ESTADO SITUACIONAL al 20-04-2026": "1. GESTIÓN DE PAGO DE PLANILLAS DE COMPENSACIONES ECONÓMICAS Y NO ECONÓMICAS - SE HA CUMPLIDO EN SU TOTALIDAD RESPECTO A LAS PLANILLAS CAS REMUNERACIONES Y PAGO POR VACACIONES TRUNCAS Y/O NO GOZADAS
+2. DECLARACIONES Y PAGO DE T-REGISTRO / PLAME -SUNAT - HASTA EL MES DE NOVIEMBRE /DIC SE DECLARA ENERO 2026
+3. DECLARACIONES Y PAGO DE AFP-NET - SE HA CUMPLID CON TODAS LASDECLARACIONES Y / O PAGOS CORRESPONDIENTE A LAS PLANILLA DEL 2025 / REPRO / DEUDAS AFP / 
+4. PAGO DE LIQUIDACIONES DE BENEFICIOS SOCIO-LABORALESPlanilla Electrónica (PLAME) según Cronograma Tributario 2025 EN SU TOTALIDAD  HASTA EL MES DE NOVIEMBRE / DIC se declara en enero del 2026.", "ACCIONES  A ADOPTAR  A CORTO Y MEDIANO PLAZO 2026": "Queda pendiente el pago de tres liquidaciones de beneficios sociales del personal que han renunciado en el mes de dicembre. El dia de hoy el encargado de control de asistencia me ha enviado los record vacacionales de los 3 servidores para el cálculo de su liquidación.", "PLAZO HASTA": "Mes de enero de 2026", "RESPONSABLES": "Elizabeth Luyo", "RR-LOGISTICOS": "", "s/ APROX": "", "DL 728": "", "CAS": "", "LOC SS": "", "Total Req RH": "", "S/ Req RH mensual": "", "SUB TOTAL": ""}}, {"id": "f7", "codigo": "DT01-2026-0007", "fechaCorte": "2026-04-20", "anio": "2026", "unidad": "Unidad de Gestión de Personal - UGP", "responsable": "Elizabeth Luyo", "subsistema": "Ss5: GESTIÓN DE COMPENSACIONES", "procesoGrupo": "16.- Administración de  beneficios  - pensiones", "subCodigo": "16", "subNombre": "Administración de  beneficios  - pensiones", "item": "16.- Administración de  beneficios  - pensiones", "estado": "Borrador", "estadoTexto": "Se consultó a la ONP con respecto a la transferencia de los Pensionistas quienes manifestaron que algunas Unidades Ejecutoras parcialmente estan realizando la trasferencia, entre ellas la UE de VIVIENDA. Se envió correo electrónico a Viivienda para consultar la situación de transferencia en el caso de los 2 pensionistas que administra la SBN pero aún no se ha tenido respuesta. Cabe señalar, que se cumplió con enviar toda la información solicitada por Vivienda, pero resulta que los 2 pensionistas tenían suspendidas su pensión desde el año 2007 y 2009 y que recién en el mes de julio de 2024 han sido habilitadas sus registros en el AIRHSP. Es por ese motivo, que no se pudo realizar la transferencia.", "accionesTexto": "Se procederá a realizar las consultas y corodinaciones a VIVIENDA y a la ONP corerspondiente a la transferencia de los dos (2) pensionistas que administra la SBN", "plazo": "", "responsables": "Elizabeth Luyo", "rrlog": "Se requiere el apoyo de un personal para que vaya presencialemte a VIVIENDA con la finalidad de realizar las consultas sobre la transferencia de los pensionsitas a la ONP. Cabe señalar, que la suscrita presenta discapacidad motora para movilizarse normalmente.", "costoLogistico": 0, "req728": 0, "reqCas": 0, "reqLocacion": 0, "costo728": 0, "costoCas": 0, "costoLocacion": 0, "obs728": "", "obsCas": "", "obsLocacion": "", "totalReqRH": 0, "totalCostoRH": 0, "total": 0, "creadoEn": "", "_official": {"SUB SISTEMAS": "Ss5: GESTIÓN DE COMPENSACIONES", "PROCESOS": "16.- Administración de  beneficios  - pensiones", "ESTADO SITUACIONAL al 20-04-2026": "Se consultó a la ONP con respecto a la transferencia de los Pensionistas quienes manifestaron que algunas Unidades Ejecutoras parcialmente estan realizando la trasferencia, entre ellas la UE de VIVIENDA. Se envió correo electrónico a Viivienda para consultar la situación de transferencia en el caso de los 2 pensionistas que administra la SBN pero aún no se ha tenido respuesta. Cabe señalar, que se cumplió con enviar toda la información solicitada por Vivienda, pero resulta que los 2 pensionistas tenían suspendidas su pensión desde el año 2007 y 2009 y que recién en el mes de julio de 2024 han sido habilitadas sus registros en el AIRHSP. Es por ese motivo, que no se pudo realizar la transferencia.", "ACCIONES  A ADOPTAR  A CORTO Y MEDIANO PLAZO 2026": "Se procederá a realizar las consultas y corodinaciones a VIVIENDA y a la ONP corerspondiente a la transferencia de los dos (2) pensionistas que administra la SBN", "PLAZO HASTA": "", "RESPONSABLES": "Elizabeth Luyo", "RR-LOGISTICOS": "Se requiere el apoyo de un personal para que vaya presencialemte a VIVIENDA con la finalidad de realizar las consultas sobre la transferencia de los pensionsitas a la ONP. Cabe señalar, que la suscrita presenta discapacidad motora para movilizarse normalmente.", "s/ APROX": "", "DL 728": "", "CAS": "", "LOC SS": "", "Total Req RH": "", "S/ Req RH mensual": "", "SUB TOTAL": ""}}];
+const DEFAULT_SYSTEM_CONFIG={
+  nombre:'DT01_UGP-OPH-RENIEC _ Reporte Anteced Estad Situacional a la Recepcion de Cargo AOG Vr',
+  sigla:'DT01_UGP-OPH-RENIEC',
+  version:'AOG Vr',
+  entidad:'RENIEC',
+  unidad:'Unidad de Gestión de Personal - UGP',
+  oficina:'OPH',
+  logoTexto:'RENIEC',
+  logoData:''
+};
+
+function proc(codigo,nombre,items,acciones){return{codigo,nombre,items,acciones}}
+function it(nombre,opciones,texto){return{nombre,opciones,texto}}
+
+const DATA={
+  'GESTIÓN UGP':{
+    'Gestión UGP':[
+      proc('1','Subproceso de Gestión Documental',[it('Gestión documental',['Documentos recibidos pendientes de atención','Documentos derivados a unidades orgánicas','Expedientes pendientes de respuesta','Se requiere trazabilidad documental','Se requiere digitalización o archivo'],'Se registra el estado de la gestión documental de la UGP, considerando recepción, derivación, atención, trazabilidad y archivo de documentos.')],['Implementar matriz de seguimiento documental','Regularizar documentos pendientes','Asignar responsables por expediente','Actualizar control de derivaciones','Consolidar reporte de documentos atendidos']),
+      proc('13','Subproceso de Gestión Presupuestal - SIAF-RH',[it('Gestión presupuestal SIAF-RH',['Certificación presupuestal pendiente','Compromisos registrados','Devengados pendientes','Saldos por verificar','Conciliación presupuestal pendiente'],'Se evalúa la gestión presupuestal vinculada a recursos humanos, registros SIAF-RH y seguimiento de compromisos, devengados y saldos.')],['Validar disponibilidad presupuestal','Regularizar registros en SIAF-RH','Consolidar saldos presupuestales','Coordinar con presupuesto y contabilidad','Emitir reporte presupuestal de RH']),
+      proc('14','Subproceso de Programación Anual/Multianual, Inventario Patrimonial, Adquisiciones y Contrataciones de Bienes y Servicios de RH',[it('Programación, inventario y contrataciones',['Programación anual pendiente','Programación multianual pendiente','Inventario patrimonial desactualizado','Adquisiciones en trámite','Contrataciones de bienes y servicios pendientes'],'Se registra la programación anual y multianual, inventario patrimonial, adquisiciones y contrataciones de bienes y servicios asociados a recursos humanos.')],['Actualizar programación anual y multianual','Regularizar inventario patrimonial','Consolidar requerimientos de bienes y servicios','Coordinar contrataciones necesarias','Registrar seguimiento de adquisiciones']),
+      proc('15','Subproceso de Gestión de Elaboración y Modificación de Documentos de Gestión de RH: MCC, CAP P, PAP, MPP y CPE',[it('Documentos de gestión de RH',['MCC pendiente de actualización','CAP P pendiente de modificación','PAP en revisión','MPP pendiente de validación','CPE requiere coordinación técnica'],'Se revisa la elaboración y modificación de documentos de gestión de recursos humanos, incluyendo MCC, CAP P, PAP, MPP y CPE.')],['Actualizar documentos de gestión de RH','Coordinar validación técnica','Consolidar sustento normativo','Gestionar aprobación de modificaciones','Registrar control de versiones']),
+      proc('16','Subproceso de Gestiones AIRHSP, SUNAT, AFPs - Conciliación de Estados Financieros RH, POI',[it('Gestiones externas y conciliaciones',['AIRHSP pendiente de actualización','Declaraciones SUNAT en seguimiento','AFP pendiente de regularización','Conciliación financiera pendiente','POI requiere actualización'],'Se registran gestiones ante AIRHSP, SUNAT, AFPs, conciliación de estados financieros de recursos humanos y seguimiento del POI.')],['Actualizar registros AIRHSP','Regularizar declaraciones SUNAT y AFPs','Realizar conciliación financiera RH','Actualizar seguimiento POI','Consolidar reporte de obligaciones'])
+    ]
+  },
+  'SS GESTIÓN DEL EMPLEO':{
+    'Gestión de la Incorporación':[
+      proc('2','Subproceso de Reclutamiento - Selección de personal',[it('Reclutamiento y selección',['Convocatorias realizadas','Puestos temporales identificados','Puestos por suplencia identificados','Procesos desiertos o vacantes','Cronograma pendiente'],'Se registra actividad vinculada al reclutamiento y selección de personal, considerando convocatorias, puestos temporales, suplencias, vacantes y procesos desiertos.')],['Coberturar plazas vacantes o desiertas','Revisar requisitos de perfiles','Mejorar difusión de convocatorias','Actualizar cronograma','Sistematizar selección mediante plataforma web']),
+      proc('3','Subproceso de Vinculación - Contratación laboral',[it('Vinculación y contratación',['Contratos emitidos','Resoluciones emitidas','Contratos temporales registrados','Contratos pendientes de emisión','Verificación posterior pendiente'],'Se registra la vinculación y contratación laboral, incluyendo contratos, resoluciones, vigencia, verificación posterior y control de documentación.')],['Implementar matriz de contratos','Validar fechas de inicio y término','Controlar vencimientos','Estandarizar checklist documental','Asegurar inicio de servicio desde el primer día hábil cuando corresponda']),
+      proc('4','Subproceso de Inducción',[it('Inducción de personal',['Inducción programada','Inducción ejecutada','Inducción pendiente','Material de inducción desactualizado','Registro de participantes incompleto'],'Se verifica la programación, ejecución y registro de la inducción del personal incorporado.')],['Programar inducciones pendientes','Actualizar material de inducción','Registrar participantes','Evaluar comprensión de contenidos','Emitir constancia de inducción']),
+      proc('5','Subproceso de Periodo de Prueba',[it('Periodo de prueba',['Evaluaciones registradas','Evaluaciones pendientes','Vencimientos próximos','Sustento documental incompleto','Resultado pendiente de validación'],'Se realiza seguimiento al periodo de prueba, vencimientos, evaluación y sustento documental correspondiente.')],['Alertar vencimientos','Solicitar evaluaciones pendientes','Regularizar sustento documental','Consolidar resultados','Informar a responsables de unidad'])
+    ],
+    'Administración de Personas':[
+      proc('6','Subproceso de Administración de Legajos',[it('Legajos',['Legajos pendientes de apertura','Legajos pendientes de actualización','Inventario en proceso','Inventario pendiente','Documentación incompleta'],'Se identifican actividades pendientes de apertura, actualización, inventario, archivo y digitalización de legajos.')],['Aperturar legajos pendientes','Elaborar inventario conforme a estructura requerida','Coordinar transferencia documental','Evaluar digitalización progresiva','Liberar espacio físico mediante remisión a archivo']),
+      proc('7','Subproceso de Control de Asistencia, Permisos, Licencias, Compensaciones Horarias, Vacaciones',[it('Control de asistencia, permisos y vacaciones',['Se mantiene el porcentaje de tardanzas','Se incrementaron las tardanzas','Existen reincidencias','Existen permisos compensables vigentes','Existen vacaciones acumuladas','Pendiente de regularización documental'],'Se registra información vinculada al control de asistencia, permisos, licencias, compensaciones horarias y vacaciones del personal.')],['Reportar tardanzas a unidades orgánicas','Evaluar reincidencias para Secretaría Técnica','Solicitar opinión legal sobre permisos','Comunicar vacaciones acumuladas','Actualizar programación vacacional','Implementar sistema digital de asistencia']),
+      proc('8','Subproceso de Gestión de Teletrabajo',[it('Teletrabajo',['Personal en teletrabajo','Personal presencial','Existe reporte mensual de actividades','Existen adendas de teletrabajo','Pendiente de actualización normativa','Se requiere instrumento digital'],'La gestión de teletrabajo requiere reportes, control de adendas, actualización normativa e instrumentos digitales.')],['Actualizar padrón de teletrabajo','Solicitar reportes mensuales','Regularizar adendas','Validar modalidad de prestación','Implementar seguimiento digital']),
+      proc('9','Subproceso de Gestión de Desplazamientos',[it('Desplazamientos',['Designaciones vigentes','Encargaturas pendientes','Rotaciones vigentes','Rotaciones con exceso de plazo','Destaques pendientes','Reasignaciones en trámite'],'Se registran movimientos y desplazamientos de personal con necesidad de control de plazos y sustento.')],['Regularizar exceso de plazo','Emitir adenda cuando corresponda','Gestionar retorno al puesto','Validar sustento del desplazamiento','Implementar matriz de desplazamientos']),
+      proc('10','Subproceso de Desvinculación Liquidación de Beneficios Sociales',[it('Desvinculación y liquidación',['Ceses registrados','Renuncias en trámite','Entrega de cargo pendiente','Liquidación pendiente','Documentación de baja incompleta'],'Se registra el estado de desvinculación, entrega de cargo, liquidación de beneficios sociales y cierre documental.')],['Regularizar documentación de cese','Coordinar liquidación de beneficios sociales','Cerrar entrega de cargo','Actualizar registros de baja','Consolidar reporte de desvinculaciones'])
+    ]
+  },
+  'SS GESTIÓN DE COMPENSACIONES':{
+    'Administración de Remuneraciones - Compensaciones':[
+      proc('11','Subproceso de Administración de Compensaciones, Remuneraciones y otros Ingresos',[it('Compensaciones y remuneraciones',['Planillas pagadas','Planillas pendientes','T-Registro realizado','PLAME declarado','AFP-NET declarado','Pagos pendientes'],'Se registra la administración de compensaciones, remuneraciones, planillas y otros ingresos sujetos a cronograma y validación.')],['Calcular pagos pendientes','Cumplir cronograma tributario','Regularizar AFP-NET','Validar planillas','Consolidar matriz de remuneraciones'])
+    ],
+    'Administración de beneficios - pensiones':[
+      proc('12','Subproceso de Administración de Pensiones',[it('Pensiones',['Consulta realizada a ONP','Pendiente de respuesta ONP','Información remitida','Transferencia pendiente','Registro pensionario pendiente'],'Se registran gestiones de administración de pensiones, coordinación externa, validación de información y seguimiento pensionario.')],['Coordinar con ONP','Realizar seguimiento documentario','Validar información del pensionista','Registrar trazabilidad','Regularizar información pensionaria'])
+    ]
+  }
+};
+
+function el(id){return document.getElementById(id)}
+function n(v){const x=parseFloat(v);return isNaN(x)?0:x}
+function moneda(v){return 'S/ '+n(v).toFixed(2)}
+function fecha(v){if(!v)return 'sin fecha';const p=v.split('-');return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:v}
+function seguro(v){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;')}
+function store(k,v){localStorage.setItem(k,JSON.stringify(v))}
+function load(k,d){return JSON.parse(localStorage.getItem(k)||JSON.stringify(d))}
+function allSubprocesses(){const out=[];Object.keys(DATA).forEach(sub=>Object.keys(DATA[sub]).forEach(procName=>DATA[sub][procName].forEach(sp=>out.push({...sp,subsistema:sub,procesoGrupo:procName,label:`${sp.codigo}.- ${sp.nombre}`}))));return out}
+function findSubprocess(sub,procName,codigo){return (DATA[sub]?.[procName]||[]).find(x=>x.codigo===codigo)||null}
+function findMetaByCodigo(codigo){return allSubprocesses().find(x=>x.codigo===codigo)||null}
+function officialHeaderHtml(){return `<thead class="official-head"><tr>${HEADERS.map(h=>`<th>${h}</th>`).join('')}</tr></thead>`}
+function officialRowHtml(r){return `<tr>${HEADERS.map(h=>`<td>${seguro(r[h]??'')}</td>`).join('')}</tr>`}
+function officialTable(rows,id='tablaDT01'){return `<div class="preview-table-wrap"><table id="${id}">${officialHeaderHtml()}<tbody>${rows.map(officialRowHtml).join('')}</tbody></table></div>`}
+
+function seedUsers(){return[
+  {id:'u1',nombre:'Carla Ramos Medina',correo:'colaborador@dt01.gob.pe',pass:'123456',unidad:'Unidad de Gestión de Personal - UGP',rol:'Colaborador',proceso:'7. Subproceso de Control de Asistencia, Permisos, Licencias, Compensaciones Horarias, Vacaciones',estado:'Activo'},
+  {id:'u2',nombre:'Sarita Aguilar Castillo',correo:'responsable@dt01.gob.pe',pass:'123456',unidad:'Unidad de Gestión de Personal - UGP',rol:'Responsable de proceso',proceso:'Todos los procesos',estado:'Activo'},
+  {id:'u3',nombre:'Administrador del sistema',correo:'admin@dt01.gob.pe',pass:'123456',unidad:'Informática / Sistemas',rol:'Administrador de sistemas',proceso:'Todos los procesos',estado:'Activo'},
+  {id:'u4',nombre:'Usuario de consulta',correo:'consulta@dt01.gob.pe',pass:'123456',unidad:'Dirección / Jefatura',rol:'Consulta / Dirección',proceso:'Todos los procesos',estado:'Activo'}
+]}
+function demoFichas(){
+  const base=[
+    ['7','Enviado',0,1,2,0,1300,1000,15000,'Carla Ramos Medina'],
+    ['6','Validado',0,1,1,0,3500,2000,8000,'Luis Ortega Huamán'],
+    ['2','Observado',1,2,0,4200,3000,0,12000,'María Torres Salas'],
+    ['11','Exportado',1,1,0,4500,3500,0,6000,'Rosa Salazar Díaz'],
+    ['12','Validado',0,1,0,0,3000,0,2500,'Edwin Mori Paredes'],
+    ['1','Enviado',0,1,0,0,2800,0,1000,'Luis Ortega Huamán'],
+    ['13','Borrador',0,1,1,0,2500,1200,3500,'Carla Ramos Medina']
+  ];
+  return base.map((x,i)=>{
+    const meta=findMetaByCodigo(x[0]);
+    const totalReq=x[2]+x[3]+x[4];
+    const totalRH=x[2]*x[5]+x[3]*x[6]+x[4]*x[7];
+    const total=totalRH+x[8];
+    return {id:'f'+(i+1),codigo:`DT01-2026-00${i+1}`,fechaCorte:'2026-04-20',anio:'2026',unidad:'Unidad de Gestión de Personal - UGP',responsable:x[9],subsistema:meta.subsistema,procesoGrupo:meta.procesoGrupo,subCodigo:meta.codigo,subNombre:meta.nombre,item:'Diagnóstico operativo\nSeguimiento documentario',estado:x[1],estadoTexto:`Al corte 20/04/2026, el ${meta.codigo}.- ${meta.nombre} presenta situaciones registradas para validación y seguimiento operativo.`,accionesTexto:'Corresponde ejecutar acciones de regularización, seguimiento, coordinación interna y mejora del control documental.',plazo:'31/12/2026',responsables:'UGP / Responsable del proceso',rrlog:'Requerimiento operativo sujeto a evaluación técnica',costoLogistico:x[8],req728:x[2],reqCas:x[3],reqLocacion:x[4],costo728:x[5],costoCas:x[6],costoLocacion:x[7],obs728:'',obsCas:'',obsLocacion:'',totalReqRH:totalReq,totalCostoRH:totalRH,total,creadoEn:new Date(2026,3,20+i).toLocaleString('es-PE')}
+  })
+}
+function seedData(){
+  if(!localStorage.getItem('dt01_system_config_v4'))store('dt01_system_config_v4',DEFAULT_SYSTEM_CONFIG);
+  if(!localStorage.getItem('dt01_users_v4'))store('dt01_users_v4',seedUsers());
+  if(!localStorage.getItem('dt01_fichas_v4'))store('dt01_fichas_v4',INITIAL_FICHAS)
+}
+function resetDemoData(){localStorage.removeItem('dt01_users_v4');localStorage.removeItem('dt01_fichas_v4');localStorage.removeItem('dt01_session_v4');localStorage.removeItem('dt01_system_config_v4');seedData();applySystemConfig();showLogin()}
+
+let session=null;
+let editingFichaId=null;
+function init(){seedData();applySystemConfig();const s=load('dt01_session_v4',null);if(s){session=s;showApp()}else showLogin()}
+function showLogin(){applySystemConfig();el('loginView').classList.remove('hidden');el('appShell').classList.add('hidden')}
+function demoLogin(correo){el('loginEmail').value=correo;el('loginPassword').value='123456';login()}
+function login(){const correo=el('loginEmail').value.trim().toLowerCase();const pass=el('loginPassword').value;const user=load('dt01_users_v4',[]).find(u=>u.correo.toLowerCase()===correo&&u.pass===pass&&u.estado==='Activo');if(!user){el('loginMsg').textContent='Credenciales inválidas o usuario inactivo.';el('loginMsg').classList.add('show');return}session=user;store('dt01_session_v4',user);showApp()}
+function logout(){localStorage.removeItem('dt01_session_v4');session=null;showLogin()}
+function showApp(){applySystemConfig();el('loginView').classList.add('hidden');el('appShell').classList.remove('hidden');el('userNameSide').textContent=session.nombre;el('userUnitSide').textContent=session.unidad;el('userRoleSide').textContent=session.rol;el('userProcessSide').textContent=session.proceso;renderNav();fillFormDefaults();goView('dashboard')}
+function renderNav(){const nav=[['dashboard','▣ Panel principal']];if(['Colaborador','Responsable de proceso','Administrador de sistemas'].includes(session.rol))nav.push(['registro','✎ Registro DT01']);if(['Responsable de proceso','Administrador de sistemas'].includes(session.rol))nav.push(['revision','● Revisión']);if(['Responsable de proceso','Administrador de sistemas','Consulta / Dirección'].includes(session.rol))nav.push(['reportes','▤ Reportes KPI']);if(session.rol==='Administrador de sistemas')nav.push(['admin','▦ Administración']);nav.push(['preview','□ Vista previa']);el('navMenu').innerHTML=nav.map(x=>`<button class="nav-item" data-view="${x[0]}" onclick="goView('${x[0]}')">${x[1]}</button>`).join('')}
+function goView(view){document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));el('view-'+view).classList.remove('hidden');document.querySelectorAll('.nav-item[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));const titles={dashboard:'Panel principal',registro:'Registro DT01',revision:'Bandeja de revisión',reportes:'Reportes KPI',admin:'Administrador de sistemas',preview:'Vista previa DT01'};el('pageTitle').textContent='DT01 - '+titles[view];el('pageSubtitle').textContent=`Sesión activa: ${session.nombre} | Rol: ${session.rol}`;if(view==='dashboard')renderDashboard();if(view==='revision')renderRevision();if(view==='reportes')renderReportes();if(view==='admin')renderAdmin();if(view==='preview')vistaPreviaActual()}
+function goViewNoRender(view){document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));el('view-'+view).classList.remove('hidden');document.querySelectorAll('.nav-item[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view))}
+
+function fillFormDefaults(){
+  el('responsableLlenado').value=session.nombre;el('unidadOrganica').value=session.unidad;
+  el('subsistema').innerHTML=Object.keys(DATA).map(s=>`<option>${seguro(s)}</option>`).join('');
+  el('subsistema').onchange=renderProcesos;
+  el('procesoGrupo').onchange=renderSubprocesos;
+  el('subproceso').onchange=renderSubprocesoDinamico;
+  ['fechaCorte','anioGestion','plazoHasta','responsables','prioridad','costoLogistico','req728','reqCas','reqLocacion','costo728','costoCas','costoLocacion'].forEach(id=>el(id).oninput=()=>{calcularRecursosSilencioso();generarTextoAcciones(false)});
+  renderProcesos();renderAdminProcessSelect();calcularRecursosSilencioso();
+}
+function renderProcesos(){
+  const sub=el('subsistema').value;
+  const procesos=Object.keys(DATA[sub]||{});
+  el('procesoGrupo').innerHTML=procesos.map(p=>`<option>${seguro(p)}</option>`).join('');
+  const assignedCode=assignedCodeFromSession();
+  if(assignedCode){
+    const meta=findMetaByCodigo(assignedCode);
+    if(meta && meta.subsistema===sub) el('procesoGrupo').value=meta.procesoGrupo;
+  }
+  renderSubprocesos();
+}
+function renderSubprocesos(){
+  const sub=el('subsistema').value;
+  const procName=el('procesoGrupo').value;
+  const lista=DATA[sub]?.[procName]||[];
+  el('subproceso').innerHTML=lista.map((p,i)=>`<option value="${i}" data-code="${p.codigo}">${p.codigo}.- ${seguro(p.nombre)}</option>`).join('');
+  const assignedCode=assignedCodeFromSession();
+  if(assignedCode){const opt=Array.from(el('subproceso').options).find(o=>o.dataset.code===assignedCode);if(opt)el('subproceso').value=opt.value}
+  renderSubprocesoDinamico();
+}
+function assignedCodeFromSession(){if(!session||!session.proceso||session.proceso==='Todos los procesos')return null;return session.proceso.split('.')[0].trim()}
+function subprocesoActual(){const sub=el('subsistema').value;const procName=el('procesoGrupo').value;const code=el('subproceso').selectedOptions[0]?.dataset.code;return findSubprocess(sub,procName,code)}
+function renderSubprocesoDinamico(){const p=subprocesoActual();if(!p)return;el('chipsProceso').innerHTML=`<span class="chip">${seguro(el('subsistema').value)}</span><span class="chip">Proceso: ${seguro(el('procesoGrupo').value)}</span><span class="chip">Subproceso: ${p.codigo}.- ${seguro(p.nombre)}</span><span class="chip">${p.items.length} ítems</span><span class="chip">${p.acciones.length} acciones</span>`;el('itemsContainer').innerHTML=`<div class="process-open-box">Subproceso seleccionado: <strong>${p.codigo}.- ${seguro(p.nombre)}</strong>. Abra el ítem y marque las situaciones correspondientes.</div>`+p.items.map((itx,idx)=>`<div class="item-card ${idx?'collapsed':''}" data-card="${idx}"><div class="item-head" onclick="toggleItem(${idx})"><div><h4>${idx+1}. ${seguro(itx.nombre)}</h4><small>${itx.opciones.length} opciones disponibles</small></div><span class="pill pill-info">${idx?'Abrir':'Abierto'}</span></div><div class="item-content"><div class="option-list">${itx.opciones.map((op,j)=>`<label class="check-option"><input type="checkbox" class="estado-check" data-item="${idx}" data-opcion="${j}"><span>${seguro(op)}</span></label>`).join('')}</div><div class="grid grid-3" style="margin-top:12px"><div class="form-row"><label>Cantidad / valor</label><input class="item-cantidad" data-item="${idx}" type="number" min="0"></div><div class="form-row"><label>Fecha referencia</label><input class="item-fecha" data-item="${idx}" type="date"></div><div class="form-row"><label>Observación</label><input class="item-observacion" data-item="${idx}"></div></div></div></div>`).join('');el('accionesContainer').innerHTML=p.acciones.map((a,i)=>`<label class="check-option"><input type="checkbox" class="accion-check" data-accion="${i}"><span>${seguro(a)}</span></label>`).join('');document.querySelectorAll('.estado-check,.item-cantidad,.item-fecha,.item-observacion').forEach(x=>x.onchange=()=>generarTextoSituacional(false));document.querySelectorAll('.accion-check').forEach(x=>x.onchange=()=>generarTextoAcciones(false));sugerirRecurso(p.codigo);generarTextoSituacional(false);generarTextoAcciones(false);calcularRecursosSilencioso()}
+function toggleItem(i){const c=document.querySelector(`[data-card="${i}"]`);c.classList.toggle('collapsed');c.querySelector('.pill').textContent=c.classList.contains('collapsed')?'Abrir':'Abierto'}
+function expandirItems(){document.querySelectorAll('.item-card').forEach(c=>{c.classList.remove('collapsed');c.querySelector('.pill').textContent='Abierto'})}
+function contraerItems(){document.querySelectorAll('.item-card').forEach(c=>{c.classList.add('collapsed');c.querySelector('.pill').textContent='Abrir'})}
+function sugerirRecurso(codigo){if(['7','8'].includes(codigo)){el('tipoRecurso').value='Sistema informático';el('descRecurso').value='Implementación o mejora de sistema digital de control, seguimiento y reportería.'}else if(codigo==='6'){el('tipoRecurso').value='Digitalización documental';el('descRecurso').value='Digitalización progresiva e inventario de legajos.'}else{el('tipoRecurso').value='No requiere';el('descRecurso').value=''}}
+function estadosMarcados(){const p=subprocesoActual();const out=[];document.querySelectorAll('.estado-check:checked').forEach(ch=>{const i=+ch.dataset.item,j=+ch.dataset.opcion;const cant=document.querySelector(`.item-cantidad[data-item="${i}"]`)?.value||'';const obs=document.querySelector(`.item-observacion[data-item="${i}"]`)?.value||'';out.push({item:p.items[i].nombre,opcion:p.items[i].opciones[j],texto:p.items[i].texto,cant,obs})});return out}
+function accionesMarcadas(){const p=subprocesoActual();return Array.from(document.querySelectorAll('.accion-check:checked')).map(ch=>p.acciones[+ch.dataset.accion])}
+function generarTextoSituacional(show=true){const p=subprocesoActual();if(!p)return;const ms=estadosMarcados();let txt='';if(!ms.length)txt=`Para el ${p.codigo}.- ${p.nombre}, aún no se han marcado situaciones específicas.`;else{const g={};ms.forEach(m=>{if(!g[m.item])g[m.item]=[];let d=m.opcion;if(m.cant)d+=` (cantidad: ${m.cant})`;if(m.obs)d+=` (obs.: ${m.obs})`;g[m.item].push(d)});txt=`Al corte ${fecha(el('fechaCorte').value)}, el ${p.codigo}.- ${p.nombre} presenta el siguiente estado situacional:${salto}${salto}`+Object.keys(g).map(k=>`• ${k}: ${p.items.find(x=>x.nombre===k).texto} Situaciones marcadas: ${g[k].join('; ')}.`).join(salto)+`${salto}${salto}El diagnóstico deberá ser validado por la unidad competente.`}el('estadoSituacionalTexto').value=txt;if(show)msg('alert-ok','Estado situacional generado.')}
+function generarTextoAcciones(show=true){const ac=accionesMarcadas();const p=subprocesoActual();let txt=!ac.length?`Para el ${p.codigo}.- ${p.nombre}, aún no se han seleccionado acciones.`:`Como acciones a adoptar durante ${el('anioGestion').value}, corresponde: ${ac.map(a=>a.charAt(0).toLowerCase()+a.slice(1)).join('; ')}. Plazo: ${fecha(el('plazoHasta').value)}. Responsables: ${el('responsables').value}. Prioridad: ${el('prioridad').value}.`;el('accionesTexto').value=txt;if(show)msg('alert-ok','Acciones generadas.')}
+function marcarSugeridas(){document.querySelectorAll('.estado-check').forEach((x,i)=>x.checked=i%2===0);generarTextoSituacional(false);msg('alert-ok','Opciones demo marcadas.')}
+function marcarAccionesClave(){document.querySelectorAll('.accion-check').forEach((x,i)=>x.checked=i<4);generarTextoAcciones(false);msg('alert-ok','Acciones clave marcadas.')}
+function desmarcarAcciones(){document.querySelectorAll('.accion-check').forEach(x=>x.checked=false);generarTextoAcciones(false)}
+
+function calcularRecursosSilencioso(){const req728=n(el('req728').value),reqCas=n(el('reqCas').value),reqLoc=n(el('reqLocacion').value);const c728=n(el('costo728').value),cCas=n(el('costoCas').value),cLoc=n(el('costoLocacion').value),cLog=n(el('costoLogistico').value);const s728=req728*c728,sCas=reqCas*cCas,sLoc=reqLoc*cLoc,totalReq=req728+reqCas+reqLoc,totalRH=s728+sCas+sLoc,total=totalRH+cLog;el('sub728').value=s728.toFixed(2);el('subCas').value=sCas.toFixed(2);el('subLocacion').value=sLoc.toFixed(2);el('totalReqRH').value=totalReq;el('totalCostoRH').value=totalRH.toFixed(2);el('resumenCostoLogistico').value=cLog.toFixed(2);el('subtotalEstimado').value=total.toFixed(2);el('resumenPresupuestoRH').textContent=`Resumen presupuestal mensual:${salto}DL 728: ${req728} x ${moneda(c728)} = ${moneda(s728)}${salto}CAS: ${reqCas} x ${moneda(cCas)} = ${moneda(sCas)}${salto}Locación / servicio: ${reqLoc} x ${moneda(cLoc)} = ${moneda(sLoc)}${salto}Total Req. RH: ${totalReq}${salto}S/ Req. RH mensual: ${moneda(totalRH)}${salto}S/ aprox. logístico: ${moneda(cLog)}${salto}Subtotal general requerido: ${moneda(total)}`}
+function calcularRecursos(){calcularRecursosSilencioso();msg('alert-ok','Cálculo presupuestal actualizado correctamente.')}
+function validarFicha(){const errs=[];if(!estadosMarcados().length)errs.push('Debe marcar al menos una situación.');if(!accionesMarcadas().length)errs.push('Debe marcar al menos una acción.');if(!el('responsables').value)errs.push('Debe registrar responsables.');if(errs.length){modal('Observaciones de validación',`<div class="text-box">${seguro(errs.map((e,i)=>`${i+1}. ${e}`).join(salto))}</div>`);return false}modal('Validación correcta','<div class="text-box">La ficha cumple las validaciones mínimas del prototipo v4.</div>');return true}
+function currentFichaData(estado){const p=subprocesoActual();calcularRecursosSilencioso();return{id:editingFichaId||'f'+Date.now(),codigo:editingFichaId?editingFichaId:'DT01-'+Date.now(),fechaCorte:el('fechaCorte').value,anio:el('anioGestion').value,unidad:el('unidadOrganica').value,responsable:el('responsableLlenado').value,subsistema:el('subsistema').value,procesoGrupo:el('procesoGrupo').value,subCodigo:p.codigo,subNombre:p.nombre,item:[...new Set(estadosMarcados().map(x=>x.item))].join(salto)||'Sin ítems marcados',estado:estado||el('estadoRegistro').value,estadoTexto:el('estadoSituacionalTexto').value,accionesTexto:el('accionesTexto').value,plazo:fecha(el('plazoHasta').value),responsables:el('responsables').value,rrlog:(el('tipoRecurso').value==='No requiere'?'No requiere':el('tipoRecurso').value+' - '+el('descRecurso').value),costoLogistico:n(el('costoLogistico').value),req728:n(el('req728').value),reqCas:n(el('reqCas').value),reqLocacion:n(el('reqLocacion').value),costo728:n(el('costo728').value),costoCas:n(el('costoCas').value),costoLocacion:n(el('costoLocacion').value),obs728:el('obs728').value,obsCas:el('obsCas').value,obsLocacion:el('obsLocacion').value,totalReqRH:n(el('totalReqRH').value),totalCostoRH:n(el('totalCostoRH').value),total:n(el('subtotalEstimado').value),creadoEn:new Date().toLocaleString('es-PE')}}
+async function guardarFicha(estado){
+  if(estado==='Enviado'&&!validarFicha())return;
+  const fichas=load('dt01_fichas_v4',[]);
+  const data=currentFichaData(estado);
+  const idx=fichas.findIndex(f=>f.id===data.id);
+  if(idx>=0)fichas[idx]=data;else fichas.unshift(data);
+  store('dt01_fichas_v4',fichas);
+  editingFichaId=null;
+  renderDashboard();
+  const syncOk=await autosyncDespuesDeGuardar(fichas);
+  if(syncOk)msg('alert-ok','Ficha guardada y sincronizada con GitHub. Power BI leerá la actualización desde registros.csv.');
+  else msg('alert-info','Ficha guardada localmente. Revise Configurar GitHub si desea sincronizar con GitHub.');
+}
+
+function nuevaFicha(){editingFichaId=null;el('estadoRegistro').value='Borrador';fillFormDefaults();el('fechaCorte').value='2026-04-20';el('anioGestion').value='2026';['req728','reqCas','reqLocacion','costo728','costoCas','costoLocacion','costoLogistico'].forEach(id=>el(id).value=0);['obs728','obsCas','obsLocacion'].forEach(id=>el(id).value='');calcularRecursosSilencioso();goView('registro')}
+function toOfficialRow(f){
+  if(f && f._official){
+    const row={};
+    HEADERS.forEach(h=>row[h]=f._official[h]??'');
+    return row;
+  }
+  return {
+    'SUB SISTEMAS':f.subsistema||'',
+    'PROCESOS':`${f.procesoGrupo||''}${salto}${f.subCodigo||''}.- ${f.subNombre||''}`,
+    'ESTADO SITUACIONAL al 20-04-2026':f.estadoTexto||'',
+    'ACCIONES  A ADOPTAR  A CORTO Y MEDIANO PLAZO 2026':f.accionesTexto||'',
+    'PLAZO HASTA':f.plazo||'',
+    'RESPONSABLES':f.responsables||f.responsable||'',
+    'RR-LOGISTICOS':f.rrlog||'',
+    's/ APROX':moneda(f.costoLogistico),
+    'DL 728':f.req728||0,
+    'CAS':f.reqCas||0,
+    'LOC SS':f.reqLocacion||0,
+    'Total Req RH':f.totalReqRH??(n(f.req728)+n(f.reqCas)+n(f.reqLocacion)),
+    'S/ Req RH mensual':moneda(f.totalCostoRH),
+    'SUB TOTAL':moneda(f.total)
+  };
+}
+
+function userCanSeeFicha(f){if(['Administrador de sistemas','Consulta / Dirección','Responsable de proceso'].includes(session.rol))return true;return f.responsable===session.nombre||session.proceso.startsWith(String(f.subCodigo)+'.')}
+function visibleFichas(){return load('dt01_fichas_v4',[]).filter(userCanSeeFicha)}
+function renderDashboard(){
+  const fs=visibleFichas();
+  const val=fs.filter(f=>['Validado','Exportado'].includes(f.estado)).length;
+  el('kpiFichas').textContent=fs.length;
+  el('kpiPendientes').textContent=fs.filter(f=>f.estado==='Enviado').length;
+  el('kpiValidadas').textContent=val;
+  el('kpiPresupuesto').textContent=moneda(fs.reduce((a,f)=>a+n(f.total),0));
+  el('dashboardResumen').textContent=`Usuario: ${session.nombre}${salto}Rol: ${session.rol}${salto}Permiso operativo: ${permisoTexto()}${salto}Registros visibles: ${fs.length}${salto}Subprocesos configurados: ${allSubprocesses().length}`;
+  renderEstadoBars(fs);
+  renderUltimasFichas(fs);
+  renderDashboardAvanzado(fs);
+}
+function renderDashboardAvanzado(fs){
+  if(!el('dashAvanceValidado'))return;
+  const total=fs.length;
+  const validadas=fs.filter(f=>['Validado','Exportado'].includes(f.estado)).length;
+  const observadas=fs.filter(f=>f.estado==='Observado').length;
+  const enviadas=fs.filter(f=>f.estado==='Enviado').length;
+  const borradores=fs.filter(f=>f.estado==='Borrador').length;
+  const avance=total?Math.round((validadas/total)*100):0;
+  const costoRh=fs.reduce((a,f)=>a+n(f.totalCostoRH),0);
+  const costoLog=fs.reduce((a,f)=>a+n(f.costoLogistico),0);
+  const total728=fs.reduce((a,f)=>a+n(f.req728),0);
+  const totalCas=fs.reduce((a,f)=>a+n(f.reqCas),0);
+  const totalLoc=fs.reduce((a,f)=>a+n(f.reqLocacion),0);
+  const costo728=fs.reduce((a,f)=>a+(n(f.req728)*n(f.costo728)),0);
+  const costoCas=fs.reduce((a,f)=>a+(n(f.reqCas)*n(f.costoCas)),0);
+  const costoLoc=fs.reduce((a,f)=>a+(n(f.reqLocacion)*n(f.costoLocacion)),0);
+
+  el('dashAvanceValidado').textContent=avance+'%';
+  el('dashObservadas').textContent=observadas;
+  el('dashCostoRh').textContent=moneda(costoRh);
+  el('dashCostoLogistico').textContent=moneda(costoLog);
+
+  const alertas=[];
+  if(enviadas>0)alertas.push(`• ${enviadas} ficha(s) enviadas pendientes de revisión.`);
+  if(observadas>0)alertas.push(`• ${observadas} ficha(s) observadas requieren subsanación.`);
+  if(borradores>0)alertas.push(`• ${borradores} ficha(s) permanecen en borrador.`);
+  if(costoRh>0)alertas.push(`• Presupuesto mensual de RR.HH. registrado: ${moneda(costoRh)}.`);
+  if(costoLog>0)alertas.push(`• Costo logístico aproximado registrado: ${moneda(costoLog)}.`);
+  el('dashAlertas').textContent=alertas.length?alertas.join(salto):'No existen alertas críticas con la información visible.';
+
+  el('dashPresupuestoRegimen').textContent=`DL 728: ${total728} requerimiento(s) | ${moneda(costo728)}${salto}CAS: ${totalCas} requerimiento(s) | ${moneda(costoCas)}${salto}Locación / servicio: ${totalLoc} requerimiento(s) | ${moneda(costoLoc)}${salto}Total Req. RH: ${total728+totalCas+totalLoc}${salto}Total mensual RR.HH.: ${moneda(costoRh)}`;
+
+  renderTablaAgrupadaDashboard('dashSubsistemas',fs,'subsistema');
+  renderTablaAgrupadaDashboard('dashProcesos',fs,'procesoGrupo');
+}
+function renderTablaAgrupadaDashboard(targetId,fs,campo){
+  const map={};
+  fs.forEach(f=>{
+    const key=f[campo]||'Sin dato';
+    if(!map[key])map[key]={nombre:key,fichas:0,enviadas:0,observadas:0,validadas:0,req:0,total:0};
+    map[key].fichas++;
+    if(f.estado==='Enviado')map[key].enviadas++;
+    if(f.estado==='Observado')map[key].observadas++;
+    if(['Validado','Exportado'].includes(f.estado))map[key].validadas++;
+    map[key].req+=n(f.totalReqRH);
+    map[key].total+=n(f.total);
+  });
+  const rows=Object.values(map);
+  el(targetId).innerHTML=rows.length?`<div class="preview-table-wrap"><table><thead><tr><th>Concepto</th><th>Fichas</th><th>Enviadas</th><th>Observadas</th><th>Validadas</th><th>Req. RH</th><th>Presupuesto</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${seguro(r.nombre)}</td><td>${r.fichas}</td><td>${r.enviadas}</td><td>${r.observadas}</td><td>${r.validadas}</td><td>${r.req}</td><td>${moneda(r.total)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty-state">No hay información para consolidar.</div>';
+}
+function permisoTexto(){if(session.rol==='Colaborador')return'Registra fichas del subproceso asignado.';if(session.rol==='Responsable de proceso')return'Revisa, observa y valida fichas.';if(session.rol==='Administrador de sistemas')return'Administra usuarios, roles, catálogo y KPI.';return'Consulta reportes consolidados.'}
+function renderEstadoBars(fs){const estados=['Borrador','Enviado','Observado','Validado','Exportado'];const max=Math.max(1,...estados.map(e=>fs.filter(f=>f.estado===e).length));el('estadoBars').innerHTML=estados.map(e=>{const c=fs.filter(f=>f.estado===e).length;return`<div style="margin-bottom:12px"><div class="btn-row" style="justify-content:space-between"><strong>${e}</strong><span>${c}</span></div><div class="bar"><i style="width:${(c/max)*100}%"></i></div></div>`}).join('')}
+function renderUltimasFichas(fs){el('tablaUltimasFichas').innerHTML=officialTable(fs.slice(0,8).map(toOfficialRow),'tablaUltimas')}
+function renderRevision(){const fs=load('dt01_fichas_v4',[]).filter(f=>['Enviado','Observado'].includes(f.estado));if(!fs.length){el('revisionContainer').innerHTML='<div class="empty-state">No hay fichas pendientes.</div>';return}el('revisionContainer').innerHTML=officialTable(fs.map(toOfficialRow),'tablaRevision')+`<div class="divider"></div>`+fs.map(f=>`<div class="btn-row" style="margin-bottom:8px"><strong>${seguro(f.codigo)}</strong><button class="btn-secondary" onclick="verFicha('${f.id}')">Ver</button><button class="btn-success" onclick="cambiarEstadoFicha('${f.id}','Validado')">Validar</button><button class="btn-danger" onclick="cambiarEstadoFicha('${f.id}','Observado')">Observar</button></div>`).join('')}
+function cambiarEstadoFicha(id,estado){const fs=load('dt01_fichas_v4',[]);const f=fs.find(x=>x.id===id);if(!f)return;f.estado=estado;store('dt01_fichas_v4',fs);msg('alert-ok',`Ficha ${estado.toLowerCase()}.`);renderRevision();renderDashboard()}
+function verFicha(id){const f=load('dt01_fichas_v4',[]).find(x=>x.id===id);if(!f)return;modal('Detalle de ficha',officialTable([toOfficialRow(f)],'modalTable'))}
+function renderReportes(){const fs=visibleFichas();const totalRH=fs.reduce((a,f)=>a+n(f.totalReqRH),0);const total=fs.reduce((a,f)=>a+n(f.total),0);const porProc=countBy(fs,f=>f.procesoGrupo);const porEstado=countBy(fs,f=>f.estado);el('reportesContainer').innerHTML=`<div class="grid grid-4"><div class="kpi"><span>Total fichas</span><strong>${fs.length}</strong></div><div class="kpi"><span>Req. RH total</span><strong>${totalRH}</strong></div><div class="kpi"><span>Presupuesto</span><strong>${moneda(total)}</strong></div><div class="kpi"><span>Subprocesos configurados</span><strong>${allSubprocesses().length}</strong></div></div><div class="grid grid-2"><div class="card"><h3>Por estado</h3><div class="text-box">${objLines(porEstado)}</div></div><div class="card"><h3>Por proceso</h3><div class="text-box">${objLines(porProc)}</div></div></div><div class="card"><h3>Detalle DT01 exportable</h3>${officialTable(fs.map(toOfficialRow),'tablaReporteDT01')}</div>`}
+function countBy(arr,fn){return arr.reduce((a,x)=>{const k=fn(x);a[k]=(a[k]||0)+1;return a},{})}
+function objLines(o){return Object.keys(o).map(k=>`• ${k}: ${o[k]}`).join(salto)||'Sin datos'}
+function renderAdmin(){
+  if(!el('adminUsuariosTabla'))return;
+  cargarConfigSistemaForm();
+  renderAdminProcessSelect();
+  const users=load('dt01_users_v4',[]);
+  const fs=load('dt01_fichas_v4',[]);
+  const usuariosActivos=users.filter(u=>u.estado==='Activo').length;
+  const reqRhTotal=fs.reduce((a,f)=>a+n(f.totalReqRH),0);
+  const presupuestoTotal=fs.reduce((a,f)=>a+n(f.total),0);
+  const validadas=fs.filter(f=>['Validado','Exportado'].includes(f.estado)).length;
+
+  el('adminKpiBox').textContent=`Rol funcional del administrador:${salto}• Administra usuarios, perfiles y subprocesos asignados.${salto}• Actúa como analista de sistemas para revisar trazabilidad, avance, presupuesto y carga operativa.${salto}• Supervisa consistencia de datos para reportes DT01 y exportación Excel.${salto}${salto}Indicadores generales:${salto}Usuarios activos: ${usuariosActivos}${salto}Usuarios totales: ${users.length}${salto}Fichas totales: ${fs.length}${salto}Fichas enviadas: ${fs.filter(f=>f.estado==='Enviado').length}${salto}Validadas/exportadas: ${validadas}${salto}Subprocesos configurados: ${allSubprocesses().length}${salto}Req. RH total: ${reqRhTotal}${salto}Presupuesto total: ${moneda(presupuestoTotal)}`;
+
+  if(el('adminKpiUsuariosActivos')) el('adminKpiUsuariosActivos').textContent=usuariosActivos;
+  if(el('adminKpiFichasTotal')) el('adminKpiFichasTotal').textContent=fs.length;
+  if(el('adminKpiReqRhTotal')) el('adminKpiReqRhTotal').textContent=reqRhTotal;
+  if(el('adminKpiPresupuestoTotal')) el('adminKpiPresupuestoTotal').textContent=moneda(presupuestoTotal);
+
+  renderAdminDistribuciones(users,fs);
+  renderAdminMatrizPermisos();
+  renderAdminReporteKpi();
+
+  el('adminUsuariosTabla').innerHTML=users.length?`<div class="preview-table-wrap"><table><thead><tr><th>Nombre</th><th>Correo</th><th>Rol / perfil</th><th>Subproceso asignado</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>${users.map(u=>`<tr><td>${seguro(u.nombre)}</td><td>${seguro(u.correo)}</td><td>${seguro(u.rol)}</td><td>${seguro(u.proceso)}</td><td>${seguro(u.estado)}</td><td><button class="btn-secondary" onclick="editarUsuario('${u.id}')">Editar</button> <button class="btn-ghost" onclick="toggleUsuario('${u.id}')">Activar/Inactivar</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty-state">Sin usuarios.</div>';
+  renderCatalogoTabla();
+}
+function getSystemConfig(){return load('dt01_system_config_v4',DEFAULT_SYSTEM_CONFIG)}
+function setSystemConfig(cfg){store('dt01_system_config_v4',{...DEFAULT_SYSTEM_CONFIG,...cfg})}
+function applySystemConfig(){
+  const cfg=getSystemConfig();
+  if(el('loginSystemTitle'))el('loginSystemTitle').textContent=cfg.sigla||cfg.nombre;
+  if(el('loginSystemSubtitle'))el('loginSystemSubtitle').textContent=cfg.nombre;
+  if(el('brandSystemName'))el('brandSystemName').textContent=cfg.sigla||cfg.nombre;
+  if(el('brandSystemSubtitle'))el('brandSystemSubtitle').textContent=`${cfg.unidad} | ${cfg.oficina} | ${cfg.version}`;
+  const targets=['brandLogoDisplay','configLogoPreview'];
+  targets.forEach(id=>{
+    const box=el(id);if(!box)return;
+    if(cfg.logoData){box.innerHTML=`<img src="${cfg.logoData}" alt="${seguro(cfg.logoTexto||'Logo')}" style="width:100%;height:100%;object-fit:contain;border-radius:12px">`}
+    else{box.textContent=cfg.logoTexto||cfg.sigla||'DT01'}
+  });
+}
+function cargarConfigSistemaForm(){
+  const cfg=getSystemConfig();
+  if(!el('configNombreSistema'))return;
+  el('configNombreSistema').value=cfg.nombre;
+  el('configSiglaSistema').value=cfg.sigla;
+  el('configVersionSistema').value=cfg.version;
+  el('configEntidad').value=cfg.entidad;
+  el('configUnidad').value=cfg.unidad;
+  el('configOficina').value=cfg.oficina;
+  el('configLogoTexto').value=cfg.logoTexto;
+  el('configResumenSistema').textContent=`Nombre oficial: ${cfg.nombre}${salto}Entidad: ${cfg.entidad}${salto}Unidad: ${cfg.unidad}${salto}Oficina: ${cfg.oficina}${salto}Versión: ${cfg.version}`;
+  applySystemConfig();
+}
+function guardarConfigSistema(){
+  const actual=getSystemConfig();
+  const cfg={
+    ...actual,
+    nombre:el('configNombreSistema').value.trim()||DEFAULT_SYSTEM_CONFIG.nombre,
+    sigla:el('configSiglaSistema').value.trim()||DEFAULT_SYSTEM_CONFIG.sigla,
+    version:el('configVersionSistema').value.trim()||DEFAULT_SYSTEM_CONFIG.version,
+    entidad:el('configEntidad').value.trim()||DEFAULT_SYSTEM_CONFIG.entidad,
+    unidad:el('configUnidad').value.trim()||DEFAULT_SYSTEM_CONFIG.unidad,
+    oficina:el('configOficina').value.trim()||DEFAULT_SYSTEM_CONFIG.oficina,
+    logoTexto:el('configLogoTexto').value.trim()||DEFAULT_SYSTEM_CONFIG.logoTexto
+  };
+  setSystemConfig(cfg);applySystemConfig();cargarConfigSistemaForm();msg('alert-ok','Configuración institucional del sistema actualizada correctamente.');
+}
+function restaurarConfigSistema(){setSystemConfig(DEFAULT_SYSTEM_CONFIG);applySystemConfig();cargarConfigSistemaForm();msg('alert-info','Configuración del sistema restaurada por defecto.')}
+function cargarLogoSistema(event){
+  const file=event.target.files&&event.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=()=>{const cfg=getSystemConfig();cfg.logoData=reader.result;setSystemConfig(cfg);applySystemConfig();msg('alert-ok','Logo cargado correctamente. Guarde la configuración para conservar el resto de cambios.')};
+  reader.readAsDataURL(file);
+}
+function renderAdminDistribuciones(users,fs){
+  const porRol=countBy(users,u=>u.rol||'Sin rol');
+  const porEstado=countBy(fs,f=>f.estado||'Sin estado');
+  if(el('adminUsuariosRolBox')) el('adminUsuariosRolBox').textContent=objLines(porRol);
+  if(el('adminFichasEstadoBox')) el('adminFichasEstadoBox').textContent=objLines(porEstado);
+}
+function renderAdminMatrizPermisos(){
+  if(!el('adminMatrizPermisos'))return;
+  const rows=[
+    ['Colaborador','Registrar ficha DT01, guardar borrador, enviar a revisión, exportar ficha individual','Subproceso asignado'],
+    ['Responsable de proceso','Revisar, observar, validar fichas y consultar reportes KPI','Todos los subprocesos o los asignados por gestión'],
+    ['Administrador de sistemas','Crear usuarios, asignar perfiles, activar/inactivar accesos, administrar catálogo y exportar usuarios','Todo el sistema'],
+    ['Analista de sistemas','Auditar datos, revisar trazabilidad, validar consistencia de KPI, exportar reportes consolidados','Todo el sistema'],
+    ['Consulta / Dirección','Visualizar reportes, KPI y consolidado oficial DT01','Solo lectura']
+  ];
+  el('adminMatrizPermisos').innerHTML=`<div class="preview-table-wrap"><table><thead><tr><th>Perfil</th><th>Permisos principales</th><th>Alcance</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${seguro(r[0])}</td><td>${seguro(r[1])}</td><td>${seguro(r[2])}</td></tr>`).join('')}</tbody></table></div>`;
+}
+function renderAdminReporteKpi(){
+  if(!el('adminReporteKpi'))return;
+  const fs=load('dt01_fichas_v4',[]);
+  const grupos={};
+  fs.forEach(f=>{
+    const key=`${f.subsistema}|||${f.procesoGrupo}|||${f.subCodigo}.- ${f.subNombre}`;
+    if(!grupos[key])grupos[key]={subsistema:f.subsistema,proceso:f.procesoGrupo,subproceso:`${f.subCodigo}.- ${f.subNombre}`,fichas:0,enviadas:0,observadas:0,validadas:0,totalReq:0,presupuesto:0};
+    grupos[key].fichas++;
+    if(f.estado==='Enviado')grupos[key].enviadas++;
+    if(f.estado==='Observado')grupos[key].observadas++;
+    if(['Validado','Exportado'].includes(f.estado))grupos[key].validadas++;
+    grupos[key].totalReq+=n(f.totalReqRH);
+    grupos[key].presupuesto+=n(f.total);
+  });
+  const rows=Object.values(grupos);
+  el('adminReporteKpi').innerHTML=rows.length?`<div class="preview-table-wrap"><table id="tablaAdminKpi"><thead><tr><th>Subsistema</th><th>Proceso</th><th>Subproceso</th><th>Fichas</th><th>Enviadas</th><th>Observadas</th><th>Validadas/Exportadas</th><th>Total Req. RH</th><th>Presupuesto</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${seguro(r.subsistema)}</td><td>${seguro(r.proceso)}</td><td>${seguro(r.subproceso)}</td><td>${r.fichas}</td><td>${r.enviadas}</td><td>${r.observadas}</td><td>${r.validadas}</td><td>${r.totalReq}</td><td>${moneda(r.presupuesto)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty-state">No existen fichas para consolidar KPI administrativos.</div>';
+}
+function exportarAdminKpiCSV(){
+  const fs=load('dt01_fichas_v4',[]);
+  const headers=['Subsistema','Proceso','Subproceso','Estado','Responsable','Total Req RH','Presupuesto'];
+  const rows=[headers.map(csvCampo).join(',')];
+  fs.forEach(f=>rows.push([f.subsistema,f.procesoGrupo,`${f.subCodigo}.- ${f.subNombre}`,f.estado,f.responsable,f.totalReqRH,f.total].map(csvCampo).join(',')));
+  download(rows.join(salto),'KPI_Admin_DT01_v4.csv','text/csv;charset=utf-8;');
+}
+function renderAdminProcessSelect(){if(!el('adminUserProceso'))return;el('adminUserProceso').innerHTML=['Todos los procesos',...allSubprocesses().map(p=>`${p.codigo}. ${p.nombre}`)].map(x=>`<option>${seguro(x)}</option>`).join('')}
+function guardarUsuarioAdmin(){const id=el('adminUserId').value||'u'+Date.now();const u={id,nombre:el('adminUserNombre').value,correo:el('adminUserCorreo').value,pass:el('adminUserPass').value||'123456',unidad:el('adminUserUnidad').value,rol:el('adminUserRol').value,proceso:el('adminUserProceso').value,estado:el('adminUserEstado').value};if(!u.nombre||!u.correo){msg('alert-error','Complete nombre y correo.');return}const users=load('dt01_users_v4',[]);const i=users.findIndex(x=>x.id===id);if(i>=0)users[i]=u;else users.push(u);store('dt01_users_v4',users);limpiarUsuarioForm();renderAdmin();msg('alert-ok','Usuario guardado.')}
+function editarUsuario(id){const u=load('dt01_users_v4',[]).find(x=>x.id===id);if(!u)return;el('adminUserId').value=u.id;el('adminUserNombre').value=u.nombre;el('adminUserCorreo').value=u.correo;el('adminUserPass').value=u.pass;el('adminUserUnidad').value=u.unidad;setSelect('adminUserRol',u.rol);setSelect('adminUserProceso',u.proceso);setSelect('adminUserEstado',u.estado)}
+function toggleUsuario(id){const users=load('dt01_users_v4',[]);const u=users.find(x=>x.id===id);u.estado=u.estado==='Activo'?'Inactivo':'Activo';store('dt01_users_v4',users);renderAdmin()}
+function limpiarUsuarioForm(){['adminUserId','adminUserNombre','adminUserCorreo'].forEach(id=>el(id).value='');el('adminUserPass').value='123456';el('adminUserUnidad').value='Unidad de Gestión de Personal - UGP';el('adminUserRol').value='Colaborador';el('adminUserProceso').selectedIndex=0;el('adminUserEstado').value='Activo'}
+function renderCatalogoTabla(){const rows=[];Object.keys(DATA).forEach(sub=>Object.keys(DATA[sub]).forEach(procName=>DATA[sub][procName].forEach(sp=>rows.push(`<tr><td>${seguro(sub)}</td><td>${seguro(procName)}</td><td>${seguro(sp.codigo+'.- '+sp.nombre)}</td><td>${sp.items.length}</td><td>${sp.acciones.length}</td></tr>`))));el('catalogoTabla').innerHTML=`<div class="preview-table-wrap"><table><thead><tr><th>Subsistema</th><th>Proceso</th><th>Subproceso</th><th>Ítems</th><th>Acciones</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>`}
+function seedMoreFichas(){const fs=load('dt01_fichas_v4',[]);fs.unshift(...demoFichas().slice(0,4).map((f,i)=>({...f,id:'fx'+Date.now()+i,codigo:'DT01-DEMO-'+Date.now()+i})));store('dt01_fichas_v4',fs);renderDashboard();msg('alert-ok','Se agregaron fichas demo para validar KPI.')}
+function vistaPreviaActual(){const f=currentFichaData(el('estadoRegistro').value);el('previewContainer').innerHTML=officialTable([toOfficialRow(f)],'tablaPreviewDT01');goViewNoRender('preview')}
+function exportarExcelActual(){vistaPreviaActual();const cfg=getSystemConfig();const html=`<html><head><meta charset="UTF-8"></head><body><h2>${seguro(cfg.nombre)}</h2><h3>${seguro(cfg.unidad)} - ${seguro(cfg.oficina)} - ${seguro(cfg.entidad)}</h3>${el('previewContainer').innerHTML}</body></html>`;download(html,'DT01_v4.xls','application/vnd.ms-excel;charset=utf-8;')}
+function exportarReporteExcel(){const fs=visibleFichas();const cfg=getSystemConfig();const html=`<html><head><meta charset="UTF-8"></head><body><h2>${seguro(cfg.nombre)}</h2><h3>${seguro(cfg.unidad)} - ${seguro(cfg.oficina)} - ${seguro(cfg.entidad)}</h3>${officialTable(fs.map(toOfficialRow),'tablaExportReporte')}</body></html>`;download(html,'Reporte_DT01_v4.xls','application/vnd.ms-excel;charset=utf-8;')}
+function exportarKpiCSV(){const fs=visibleFichas().map(toOfficialRow);const csvText=[HEADERS.map(csvCampo).join(',')].concat(fs.map(r=>HEADERS.map(h=>csvCampo(r[h])).join(','))).join(salto);download(csvText,'Reporte_DT01_v4.csv','text/csv;charset=utf-8;')}
+function exportarUsuariosCSV(){const us=load('dt01_users_v4',[]);const csvText=['Nombre,Correo,Rol,Subproceso asignado,Estado'].concat(us.map(u=>[u.nombre,u.correo,u.rol,u.proceso,u.estado].map(csvCampo).join(','))).join(salto);download(csvText,'Usuarios_DT01_v4.csv','text/csv;charset=utf-8;')}
+function exportarCatalogoCSV(){const rows=['Subsistema,Proceso,Subproceso,Items,Acciones'];Object.keys(DATA).forEach(sub=>Object.keys(DATA[sub]).forEach(procName=>DATA[sub][procName].forEach(sp=>rows.push([sub,procName,sp.codigo+'.- '+sp.nombre,sp.items.length,sp.acciones.length].map(csvCampo).join(',')))));download(rows.join(salto),'Catalogo_DT01_v4.csv','text/csv;charset=utf-8;')}
+function csvCampo(v){return '"'+String(v??'').replaceAll('"','""')+'"'}
+function download(content,name,type){const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);msg('alert-ok','Archivo exportado.')}
+function imprimir(){window.print()}
+function setSelect(id,value){const s=el(id);if(!s)return;Array.from(s.options).forEach((o,i)=>{if(o.value===value||o.text===value)s.selectedIndex=i})}
+function msg(cls,text){const a=el('alerta');a.className='alert show '+cls;a.textContent=text;setTimeout(()=>a.className='alert',4000)}
+function modal(t,c){el('modalTitle').textContent=t;el('modalContent').innerHTML=c;el('modal').classList.add('show')}
+function cerrarModal(){el('modal').classList.remove('show')}
+
+const GITHUB_CONFIG_KEY='dt01_github_config_v1';
+function defaultGitHubConfig(){return{owner:'kevinmendozat40-wq',repo:'portal-reniec',branch:'main',jsonPath:'prototipo-dt01/data/registros.json',csvPath:'prototipo-dt01/data/registros.csv',autosync:'Activado',token:''}}
+function getGitHubConfig(){return {...defaultGitHubConfig(),...load(GITHUB_CONFIG_KEY,{})}}
+function setGitHubConfig(cfg){store(GITHUB_CONFIG_KEY,{...getGitHubConfig(),...cfg})}
+function tokenLimpio(t){return String(t||'').trim()}
+function abrirPowerBI(){const c=getGitHubConfig();window.open(`https://raw.githubusercontent.com/${c.owner}/${c.repo}/${c.branch}/${c.csvPath}`,'_blank')}
+function abrirConfigGitHub(){
+  const c=getGitHubConfig();
+  el('modalTitle').textContent='Configurar GitHub / Power BI';
+  el('modalContent').innerHTML=`
+  <div class="text-box" style="border-color:#f59e0b;background:#fff7ed">Configuración GitHub para autosync.<br>Esta configuración queda guardada solo en este navegador. El token no se sube al repositorio.</div>
+  <div class="grid grid-4" style="margin-top:14px">
+    <div class="form-row"><label>Owner</label><input id="ghOwner" value="${seguro(c.owner)}"></div>
+    <div class="form-row"><label>Repositorio</label><input id="ghRepo" value="${seguro(c.repo)}"></div>
+    <div class="form-row"><label>Rama</label><input id="ghBranch" value="${seguro(c.branch)}"></div>
+    <div class="form-row"><label>Autosync al guardar</label><select id="ghAutosync"><option ${c.autosync==='Activado'?'selected':''}>Activado</option><option ${c.autosync!=='Activado'?'selected':''}>Desactivado</option></select></div>
+  </div>
+  <div class="grid grid-2">
+    <div class="form-row"><label>Ruta JSON</label><input id="ghJsonPath" value="${seguro(c.jsonPath)}"></div>
+    <div class="form-row"><label>Ruta CSV para Power BI</label><input id="ghCsvPath" value="${seguro(c.csvPath)}"></div>
+  </div>
+  <div class="form-row"><label>Token GitHub PAT</label><input id="ghToken" type="password" value="${seguro(c.token)}" placeholder="Pega aquí tu token con Contents: Read and write"></div>
+  <div class="form-row"><label>URL Power BI generada</label><input id="ghPowerBiUrl" disabled value="https://raw.githubusercontent.com/${seguro(c.owner)}/${seguro(c.repo)}/${seguro(c.branch)}/${seguro(c.csvPath)}"></div>
+  <div id="ghEstado" class="text-box" style="border-color:#f59e0b;background:#fff7ed">Estado: pendiente de guardar o probar token.</div>
+  <div class="btn-row" style="margin-top:12px">
+    <button class="btn-primary" onclick="guardarConfigGitHub()">Guardar configuración</button>
+    <button class="btn-secondary" onclick="probarTokenGitHub()">Probar token</button>
+    <button class="btn-ghost" onclick="cargarDataDesdeGitHub()">Cargar data desde GitHub</button>
+    <button class="btn-primary" onclick="sincronizarGitHubManual()">Sincronizar ahora</button>
+    <button class="btn-ghost" onclick="cerrarModal()">Cerrar</button>
+  </div>`;
+  ['ghOwner','ghRepo','ghBranch','ghCsvPath'].forEach(id=>{const x=el(id);if(x)x.oninput=()=>{const owner=el('ghOwner').value.trim(),repo=el('ghRepo').value.trim(),branch=el('ghBranch').value.trim(),csv=el('ghCsvPath').value.trim();el('ghPowerBiUrl').value=`https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${csv}`;}});
+  el('modal').classList.add('show');
+}
+function guardarConfigGitHub(){
+  const cfg={owner:el('ghOwner').value.trim(),repo:el('ghRepo').value.trim(),branch:el('ghBranch').value.trim(),jsonPath:el('ghJsonPath').value.trim(),csvPath:el('ghCsvPath').value.trim(),autosync:el('ghAutosync').value,token:tokenLimpio(el('ghToken').value)};
+  setGitHubConfig(cfg);
+  el('ghEstado').textContent='Configuración guardada. Al guardar una ficha, el prototipo intentará actualizar GitHub automáticamente.';
+}
+function githubHeaders(){
+  const c=getGitHubConfig();
+  const h={'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};
+  if(tokenLimpio(c.token))h.Authorization='Bearer '+tokenLimpio(c.token);
+  return h;
+}
+function githubContentUrl(path){
+  const c=getGitHubConfig();
+  return `https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/contents/${path.replace(/^\/+/,'')}?ref=${encodeURIComponent(c.branch)}`;
+}
+async function githubGet(path){
+  const res=await fetch(githubContentUrl(path),{headers:githubHeaders()});
+  if(!res.ok)throw new Error(`${path}: ${res.status} ${await res.text()}`);
+  return await res.json();
+}
+function b64EncodeUnicode(str){return btoa(unescape(encodeURIComponent(str)))}
+function b64DecodeUnicode(str){return decodeURIComponent(escape(atob(String(str||'').replace(/\n/g,''))))}
+async function githubPut(path,content,message){
+  const c=getGitHubConfig();
+  let sha=null;
+  try{const meta=await githubGet(path);sha=meta.sha||null;}catch(e){sha=null;}
+  const body={message,content:b64EncodeUnicode(content),branch:c.branch};
+  if(sha)body.sha=sha;
+  let res=await fetch(`https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/contents/${path.replace(/^\/+/,'')}`,{method:'PUT',headers:{...githubHeaders(),'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(res.status===409 || res.status===422){
+    const meta=await githubGet(path);
+    body.sha=meta.sha;
+    res=await fetch(`https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/contents/${path.replace(/^\/+/,'')}`,{method:'PUT',headers:{...githubHeaders(),'Content-Type':'application/json'},body:JSON.stringify(body)});
+  }
+  if(!res.ok)throw new Error(`${path}: ${res.status} ${await res.text()}`);
+  return await res.json();
+}
+function fichasActuales(){return load('dt01_fichas_v4',[])}
+function csvDesdeFichas(fichas){
+  const rows=[HEADERS.map(csvCampo).join(',')];
+  fichas.forEach(f=>{const r=toOfficialRow(f);rows.push(HEADERS.map(h=>csvCampo(r[h]??'')).join(','));});
+  return rows.join('\n');
+}
+function jsonDesdeFichas(fichas){return JSON.stringify(fichas,null,2)}
+async function sincronizarFichasConGitHub(fichas,manual=false){
+  const c=getGitHubConfig();
+  if(!tokenLimpio(c.token))throw new Error('Token GitHub PAT no configurado.');
+  const json=jsonDesdeFichas(fichas);
+  const csv=csvDesdeFichas(fichas);
+  await githubPut(c.jsonPath,json,`Sincronizar registros DT01 JSON (${fichas.length})`);
+  await githubPut(c.csvPath,csv,`Sincronizar registros DT01 CSV para Power BI (${fichas.length})`);
+  if(manual)alert(`Sincronización correcta con GitHub: ${fichas.length} registros.`);
+  return true;
+}
+async function autosyncDespuesDeGuardar(fichas){
+  const c=getGitHubConfig();
+  if(c.autosync!=='Activado' || !tokenLimpio(c.token))return false;
+  try{await sincronizarFichasConGitHub(fichas,false);return true;}catch(e){alert('Ficha guardada localmente, pero falló la sincronización con GitHub: '+e.message);return false;}
+}
+async function sincronizarGitHubManual(){
+  try{await sincronizarFichasConGitHub(fichasActuales(),true);}
+  catch(e){alert('No se pudo sincronizar con GitHub: '+e.message);}
+}
+async function probarTokenGitHub(){
+  try{
+    guardarConfigGitHub();
+    const c=getGitHubConfig();
+    await githubGet(c.jsonPath);
+    el('ghEstado').textContent='Token válido. Se encontró la ruta JSON en GitHub. El guardado automático puede actualizar JSON y CSV.';
+  }catch(e){
+    el('ghEstado').textContent='Error al probar token o ruta: '+e.message;
+  }
+}
+async function cargarDataDesdeGitHub(){
+  try{
+    guardarConfigGitHub();
+    const c=getGitHubConfig();
+    const obj=await githubGet(c.jsonPath);
+    const content=b64DecodeUnicode(obj.content);
+    const parsed=JSON.parse(content);
+    const fichas=Array.isArray(parsed)?parsed:(parsed.fichas||[]);
+    if(!Array.isArray(fichas))throw new Error('El JSON no contiene una lista de registros.');
+    store('dt01_fichas_v4',fichas);
+    renderDashboard();
+    alert(`Base cargada desde GitHub: ${fichas.length} registros.`);
+  }catch(e){alert('No se pudo cargar data desde GitHub: '+e.message);}
+}
+
+
+init();
+</script>
+</body>
+</html>
