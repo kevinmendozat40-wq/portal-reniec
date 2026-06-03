@@ -1120,8 +1120,7 @@
       </div>
     </header>
 
-    <main class="dashboard-content">
-  <h2 id="dashboardTitle">Todos</h2>
+    <h2 id="dashboardTitle">DT00_UGH-OPH RENIEC-2026</h2>
 
   <div class="dashboard-grid">
 
@@ -1458,6 +1457,35 @@
     });
   }
 </script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Quitar selección anterior
+    document.querySelectorAll(".dashboard-menu-item").forEach(function (item) {
+        item.classList.remove("active");
+    });
 
+    // Activar DT00 en el menú
+    const menuDt00 = document.querySelector(".dashboard-menu-item[onclick*=\"'dt00'\"]");
+    if (menuDt00) {
+        menuDt00.classList.add("active");
+    }
+
+    // Cambiar título
+    const titulo = document.getElementById("dashboardTitle");
+    if (titulo) {
+        titulo.textContent = "DT00_UGH-OPH RENIEC-2026";
+    }
+
+    // Mostrar solo tarjetas DT00
+    document.querySelectorAll(".dashboard-card").forEach(function (card) {
+        const categoria = card.getAttribute("data-categoria");
+        if (categoria === "dt00") {
+            card.style.display = "";
+        } else {
+            card.style.display = "none";
+        }
+    });
+});
+</script>
 </body>
 </html>
