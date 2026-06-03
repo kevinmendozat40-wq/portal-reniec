@@ -1341,7 +1341,7 @@
       dashboardUserName.textContent = String(usuario || "").toUpperCase();
     }
 
-    filtrarDashboard(null, "todos", "Todos");
+    abrirDashboardDT00();
   }
 
   function cerrarSesionPortal() {
@@ -1465,7 +1465,23 @@
   }
 </script>
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+function abrirDashboardDT00() {
+    filtrarDashboard(null, "dt00", "DT00_UGH-OPH RENIEC-2026");
+
+    document.querySelectorAll(".dashboard-menu-item").forEach(function (item) {
+        item.classList.remove("active");
+    });
+
+    const menuDt00 = document.querySelector(".dashboard-menu-item[onclick*=\"'dt00'\"]");
+    if (menuDt00) {
+        menuDt00.classList.add("active");
+    }
+
+    const titulo = document.getElementById("dashboardTitle");
+    if (titulo) {
+        titulo.textContent = "DT00_UGH-OPH RENIEC-2026";
+    }
+}
     // Quitar selección anterior
     document.querySelectorAll(".dashboard-menu-item").forEach(function (item) {
         item.classList.remove("active");
