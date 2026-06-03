@@ -131,7 +131,7 @@
         </div>
         <div class="chips">
           <span class="chip" id="roleChip">Usuario</span>
-          <span class="chip">Versión v13 · GitHub + Power BI</span><span class="chip">Actualizado: 02/06/2026</span>
+          <span class="chip">Versión v13 · GitHub + Power BI · login primero</span><span class="chip">Actualizado: 02/06/2026</span>
           <button class="btn primary" onclick="openBiLink()">Abrir BI</button>
           <button class="btn orange" id="btnConfigureGithub" type="button" onclick="event.preventDefault(); configureGithubSync(); return false;">Configurar GitHub</button>
           <button class="btn primary" id="btnSyncGithub" type="button" onclick="event.preventDefault(); syncToGitHub(true); return false;">Sincronizar GitHub</button>
@@ -1202,6 +1202,11 @@ ${p.requisitosMCC||'No registrado'}`;
     }
 
     document.addEventListener('DOMContentLoaded', function(){
+      currentUser = null;
+      const loginBox = document.getElementById('login');
+      const appBox = document.getElementById('app');
+      if(loginBox) loginBox.style.display = 'grid';
+      if(appBox) appBox.style.display = 'none';
       const b=document.getElementById('btnConfigureGithub');
       if(b) b.addEventListener('click', function(e){ e.preventDefault(); configureGithubSync(); });
       const s=document.getElementById('btnSyncGithub');
