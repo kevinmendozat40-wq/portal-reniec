@@ -319,7 +319,7 @@ function resetDemoData(){localStorage.removeItem('dt01_users_v4');localStorage.r
 
 let session=null;
 let editingFichaId=null;
-function init(){seedData();applySystemConfig();const s=load('dt01_session_v4',null);if(s){session=s;showApp()}else showLogin()}
+function init(){seedData();applySystemConfig();localStorage.removeItem('dt01_session_v4');session=null;showLogin()}
 function showLogin(){applySystemConfig();el('loginView').classList.remove('hidden');el('appShell').classList.add('hidden')}
 function demoLogin(correo){el('loginEmail').value=correo;el('loginPassword').value='123456';login()}
 function login(){const correo=el('loginEmail').value.trim().toLowerCase();const pass=el('loginPassword').value;const user=load('dt01_users_v4',[]).find(u=>u.correo.toLowerCase()===correo&&u.pass===pass&&u.estado==='Activo');if(!user){el('loginMsg').textContent='Credenciales inválidas o usuario inactivo.';el('loginMsg').classList.add('show');return}session=user;store('dt01_session_v4',user);showApp()}
