@@ -130,7 +130,7 @@ function dt03GhHeaders(){const c=dt03GhCfg();if(!c.token)throw new Error('Debe p
 function dt03ApiUrl(path){const c=dt03GhCfg();return 'https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/'+path.split('/').map(encodeURIComponent).join('/')}
 function dt03ContentToB64(s){return btoa(unescape(encodeURIComponent(s)))}
 function dt03B64ToContent(s){return decodeURIComponent(escape(atob(String(s||'').replace(/\s/g,''))))}
-function dt03RowsToCsv(rows){const cols=[...HEADERS,'_PDF'];const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';return cols.map(q).join(',')+'\n'+rows.map(r=>cols.map(h=>q(r[h]??'')).join(',')).join('\n')}
+function dt03RowsToCsv(rows){const cols=[...HEADERS];const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';return cols.map(q).join(',')+'\n'+rows.map(r=>cols.map(h=>q(r[h]??'')).join(',')).join('\n')}
 function dt03NormalizeRows(rows){return Array.isArray(rows)?rows.map(r=>{const x={};HEADERS.forEach(h=>x[h]=r&&r[h]!=null?r[h]:'');x._PDF=(r&&r._PDF)||'';return x}):[]}
 async function dt03FetchJson(url,opt){const r=await fetch(url,opt);const txt=await r.text();let body=null;try{body=txt?JSON.parse(txt):null}catch(e){body={raw:txt}}if(!r.ok){const msg=(body&&body.message)?body.message:(txt||r.statusText);const err=new Error(msg);err.status=r.status;err.body=body;throw err}return body}
 async function dt03GetRemote(path){const c=dt03GhCfg();const url=dt03ApiUrl(path)+'?ref='+encodeURIComponent(c.branch)+'&t='+(Date.now());return await dt03FetchJson(url,{method:'GET',headers:dt03GhHeaders(),cache:'no-store'})}

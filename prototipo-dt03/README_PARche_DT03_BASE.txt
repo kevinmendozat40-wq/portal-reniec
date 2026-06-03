@@ -1,0 +1,1 @@
+Parche DT03: reemplazar solo index.html, DT03_CORREGIDOS.html y data/registros.csv + data/registros.json. No tocar documentos PDF. CSV para Power BI queda con cabeceras oficiales A:I y sin columna _PDF. JSON conserva _PDF para el HTML.
