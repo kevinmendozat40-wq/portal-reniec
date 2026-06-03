@@ -773,6 +773,13 @@
     grid-template-columns: repeat(5, 1fr);
   }
 }
+/* Inicio por defecto: mostrar solo DT00 */
+.dashboard-card[data-categoria="dt01"],
+.dashboard-card[data-categoria="dt02"],
+.dashboard-card[data-categoria="dt03"],
+.dashboard-card[data-categoria="reloj"] {
+    display: none;
+}
   </style>
 </head>
 
