@@ -1481,33 +1481,22 @@ function abrirDashboardDT00() {
     if (titulo) {
         titulo.textContent = "DT00_UGH-OPH RENIEC-2026";
     }
-}
-    // Quitar selección anterior
-    document.querySelectorAll(".dashboard-menu-item").forEach(function (item) {
-        item.classList.remove("active");
-    });
 
-    // Activar DT00 en el menú
-    const menuDt00 = document.querySelector(".dashboard-menu-item[onclick*=\"'dt00'\"]");
-    if (menuDt00) {
-        menuDt00.classList.add("active");
-    }
-
-    // Cambiar título
-    const titulo = document.getElementById("dashboardTitle");
-    if (titulo) {
-        titulo.textContent = "DT00_UGH-OPH RENIEC-2026";
-    }
-
-    // Mostrar solo tarjetas DT00
     document.querySelectorAll(".dashboard-card").forEach(function (card) {
         const categoria = card.getAttribute("data-categoria");
+
         if (categoria === "dt00") {
-            card.style.display = "";
+            card.style.display = "flex";
         } else {
             card.style.display = "none";
         }
     });
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    if (document.getElementById("dashboardView") && document.getElementById("dashboardView").style.display === "block") {
+        abrirDashboardDT00();
+    }
 });
 </script>
 </body>
