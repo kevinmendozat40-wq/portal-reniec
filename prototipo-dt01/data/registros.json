@@ -18,6 +18,22 @@
   {
     "SUB SISTEMAS": "GESTIÓN UGP",
     "PROCESOS": "Gestión UGP\n1.- Subproceso de Gestión Documental",
+    "ESTADO SITUACIONAL al 20-04-2026": "Al corte 20/04/2026, el 1.- Subproceso de Gestión Documental presenta el siguiente estado situacional:\n\n• Gestión documental: Se registra el estado de la gestión documental de la UGP, considerando recepción, derivación, atención, trazabilidad y archivo de documentos. Situaciones marcadas: Documentos recibidos pendientes de atención (cantidad: 1200) (obs.: SR); Se requiere trazabilidad documental (cantidad: 1200) (obs.: SR).\n\nEl diagnóstico deberá ser validado por la unidad competente.",
+    "ACCIONES  A ADOPTAR  A CORTO Y MEDIANO PLAZO 2026": "Como acciones a adoptar durante 2026, corresponde: regularizar documentos pendientes; asignar responsables por expediente; actualizar control de derivaciones; consolidar reporte de documentos atendidos. Plazo: 31/12/2026. Responsables: UGP / Responsable del proceso. Prioridad: Alta.",
+    "PLAZO HASTA": "31/12/2026",
+    "RESPONSABLES": "UGP / Responsable del proceso",
+    "RR-LOGISTICOS": "Sistema informático - GFHDFHDS",
+    "s/ APROX": 25000,
+    "DL 728": 2,
+    "CAS": 4,
+    "LOC SS": 1,
+    "Total Req RH": 7,
+    "S/ Req RH mensual": 225386,
+    "SUB TOTAL": 250386
+  },
+  {
+    "SUB SISTEMAS": "GESTIÓN UGP",
+    "PROCESOS": "Gestión UGP\n1.- Subproceso de Gestión Documental",
     "ESTADO SITUACIONAL al 20-04-2026": "Al corte 20/04/2026, el 1.- Subproceso de Gestión Documental presenta el siguiente estado situacional:\n\n• Gestión documental: Se registra el estado de la gestión documental de la UGP, considerando recepción, derivación, atención, trazabilidad y archivo de documentos. Situaciones marcadas: Documentos recibidos pendientes de atención.\n\nEl diagnóstico deberá ser validado por la unidad competente.",
     "ACCIONES  A ADOPTAR  A CORTO Y MEDIANO PLAZO 2026": "Para el 1.- Subproceso de Gestión Documental, aún no se han seleccionado acciones.",
     "PLAZO HASTA": "31/12/2026",
